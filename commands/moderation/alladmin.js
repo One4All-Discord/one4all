@@ -1,0 +1,138 @@
+const Command = require('../../structures/Handler/Command');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+
+module.exports = class Test extends Command{
+    constructor() {
+        super({
+            name: 'alladmins',
+            description: 'Show all members with administator permissions | Afficher tout les membres avec les perm admin',
+            usage: 'alladmins',
+            category: 'moderation',
+            clientPermissions: [PermissionFlagsBits.ManageGuild],
+            userPermissions: [PermissionFlagsBits.Administrator],
+            cooldown: 5
+
+        });
+    }
+    async run(client, message,args){
+
+    const guildData = client.getGuildData(message.guild.id);
+    const tempdata = []
+    const color = guildData.color
+    const lang = client.lang(guildData.lang)
+    const admins = message.guild.members.cache.filter(
+        (m) => m.permissions.has(PermissionFlagsBits.Administrator)
+    ).map(m => tempdata.push(m.user.id))
+
+
+
+    let noembed = new EmbedBuilder()
+        .setColor(`${color}`)
+        .setDescription(lang.alladmins.error)
+        .setTitle(lang.alladmins.list)
+        .setTimestamp()
+        .setFooter({ text: `${client.user.username}`, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
+    if (tempdata.length === 0) return message.channel.send({ embeds: [noembed] })
+
+
+    try {
+        let tdata = await message.channel.send(lang.loading)
+
+        let p0 = 0;
+        let p1 = 10;
+        let page = 1;
+
+        let embed = new EmbedBuilder()
+
+        embed.setTitle(`${lang.alladmins.list} ${tempdata.length}`)
+            .setColor(`${color}`)
+            .setDescription(tempdata
+                .filter(x => message.guild.members.cache.get(x))
+                .map(r => r)
+                .map((user, i) => `${i + 1} ・ **<@${message.guild.members.cache.get(user).user.id}>**`)
+                .slice(0, 10)
+                .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempdata.length / 10)}**`)
+            .setTimestamp()
+            .setFooter({ text: `${client.user.username}` });
+
+        let reac1
+        let reac2
+        let reac3
+
+        if (tempdata.length > 10) {
+            reac1 = await tdata.react("⬅");
+            reac2 = await tdata.react("❌");
+            reac3 = await tdata.react("➡");
+        }
+
+        tdata.edit({ embeds: [embed] });
+
+        const data_res = tdata.createReactionCollector({ filter: (reaction, user) => user.id === message.author.id, time: 120000 });
+
+        data_res.on("collect", async (reaction) => {
+
+            if (reaction.emoji.name === "⬅") {
+
+                p0 = p0 - 10;
+                p1 = p1 - 10;
+                page = page - 1
+
+                if (p0 < 0) {
+                    return
+                }
+                if (p0 === undefined || p1 === undefined) {
+                    return
+                }
+
+
+                embed.setDescription(tempdata
+                    .filter(x => message.guild.members.cache.get(x))
+                    .map(r => r)
+                    .map((user, i) => `${i + 1} ・  **<@${message.guild.members.cache.get(user).user.id}>**`)
+                    .slice(p0, p1)
+                    .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempdata.length / 10)}**`)
+                tdata.edit({ embeds: [embed] });
+
+            }
+
+            if (reaction.emoji.name === "➡") {
+
+                p0 = p0 + 10;
+                p1 = p1 + 10;
+
+                page++;
+
+                if (p1 > tempdata.length + 10) {
+                    return
+                }
+                if (p0 === undefined || p1 === undefined) {
+                    return
+                }
+
+
+                embed.setDescription(tempdata
+                    .filter(x => message.guild.members.cache.get(x))
+                    .map(r => r)
+                    .map((user, i) => `${i + 1} ・ **<@${message.guild.members.cache.get(user).user.id}>**`)
+                    .slice(p0, p1)
+                    .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempdata.length / 10)}**`)
+                tdata.edit({ embeds: [embed] });
+
+            }
+
+            if (reaction.emoji.name === "❌") {
+                data_res.stop()
+                await tdata.reactions.removeAll()
+                return tdata.delete();
+            }
+
+            await reaction.users.remove(message.author.id);
+
+        })
+
+    } catch (err) {
+        console.log(err)
+    }
+}};
+
+
