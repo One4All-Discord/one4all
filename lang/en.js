@@ -834,243 +834,262 @@ module.exports = {
 
     logs: {
         targetExecutorLogs: (type, executor, target, color, sanction) => new EmbedBuilder()
-
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a ${type}: **${target.username}**\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nTarget = ${target.id}\`\`\`` })
+            .setAuthor({ name: `${type.toUpperCase()}`, iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**Executor** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Target** — ${target.username} (\`${target.id}\`)\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
-
+            .setColor(sanction ? '#E74C3C' : color),
 
         editionMsg: (executor, before, after, color, extra) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a edité son message:`)
-            .addFields({ name: `Edition:`, value: `[Ce rendre sur le message](${extra})` })
-            .addFields({ name: 'AVANT:', value: before })
-            .addFields({ name: 'APRES:', value: after })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nMessage = ${extra.split('/')[6]}\nChannel = ${extra.split('/')[5]}\`\`\`` })
+            .setAuthor({ name: 'Message edited', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(`**By** — ${executor.user} (\`${executor.id}\`)\n[Go to message](${extra})\n\u200b`)
+            .addFields(
+                { name: 'Before', value: before.slice(0, 1024), inline: true },
+                { name: 'After', value: after.slice(0, 1024), inline: true },
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
             .setColor(color),
 
         edtionChannel: (executor, channel, before, after, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a edité le channel: <#${channel}>\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `Edition:`, value: `<#${channel}>` })
-            .addFields({ name: 'AVANT:', value: before })
-            .addFields({ name: 'APRES:', value: after })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Channel modified', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Channel** — <#${channel}>\n` +
+                (sanction ? `**Sanction** — \`${sanction}\`` : '')
+            )
+            .addFields(
+                { name: 'Before', value: before, inline: true },
+                { name: 'After', value: after, inline: true },
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : color),
 
         edtionRole: (executor, role, before, after, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a edité le rôle: <@&${role}>\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `Edition:`, value: `<@&${role}>` })
-            .addFields({ name: 'AVANT:', value: before })
-            .addFields({ name: 'APRES:', value: after })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nRole = ${role}\`\`\`` })
+            .setAuthor({ name: 'Role modified', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Role** — <@&${role}>\n` +
+                (sanction ? `**Sanction** — \`${sanction}\`` : '')
+            )
+            .addFields(
+                { name: 'Before', value: before, inline: true },
+                { name: 'After', value: after, inline: true },
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : color),
 
         guildNameUpdate: (executor, before, after, guild, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a edité le nom du serveur:\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: 'AVANT:', value: before })
-            .addFields({ name: 'APRES:', value: after })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nGuild = ${guild}\`\`\`` })
+            .setAuthor({ name: 'Server name changed', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                (sanction ? `**Sanction** — \`${sanction}\`\n` : '') + '\u200b'
+            )
+            .addFields(
+                { name: 'Before', value: before, inline: true },
+                { name: 'After', value: after, inline: true },
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : color),
 
         guildVanityUpdate: (executor, before, after, guild, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a edité l'url du serveur:\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: 'AVANT:', value: before })
-            .addFields({ name: 'APRES:', value: after })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nGuild = ${guild}\`\`\`` })
+            .setAuthor({ name: 'Vanity URL changed', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                (sanction ? `**Sanction** — \`${sanction}\`\n` : '') + '\u200b'
+            )
+            .addFields(
+                { name: 'Before', value: before || 'None', inline: true },
+                { name: 'After', value: after || 'None', inline: true },
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : color),
 
         voiceChange: (executor, target, before, after, color) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} ${executor.id === target.id ? 'a changé de salon' : `a déplacé **${target.username}**`}:`)
-            .addFields({ name: 'AVANT:', value: `<#${before}>` })
-            .addFields({ name: 'APRES:', value: `<#${after}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nTarget = ${target.id}\noldChannel = ${before}\nnewChannel = ${after}\`\`\`` })
+            .setAuthor({ name: executor.id === target.id ? 'Channel switch' : 'Member moved', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user}\n` +
+                (executor.id !== target.id ? `**Target** — ${target.username}\n` : '') + '\u200b'
+            )
+            .addFields(
+                { name: 'Before', value: `<#${before}>`, inline: true },
+                { name: 'After', value: `<#${after}>`, inline: true },
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
             .setColor(color),
 
         voiceConnect: (executor, channel, color) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} s'est connecté: <#${channel}>`)
-            .addFields({ name: 'CHANNEL:', value: `<#${channel}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Voice connected', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(`${executor.user} joined <#${channel}>`)
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor('#2ECC71'),
 
         voiceLeave: (executor, channel, color) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} s'est déconnecté: <#${channel}>`)
-            .addFields({ name: 'CHANNEL:', value: `<#${channel}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Voice disconnected', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(`${executor.user} left <#${channel}>`)
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
-
+            .setColor('#E74C3C'),
 
         voiceMute: (executor, channel, color) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} s'est mute:`)
-            .addFields({ name: 'CHANNEL:', value: `<#${channel}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Voice muted', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(`${executor.user} muted in <#${channel}>`)
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor('#F39C12'),
 
         voiceUnMute: (executor, channel, color) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} s'est unmute:`)
-            .addFields({ name: 'CHANNEL:', value: `<#${channel}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Voice unmuted', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(`${executor.user} unmuted in <#${channel}>`)
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor('#2ECC71'),
 
         messageDelete: (executor, target, channel, color, content) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} ${executor.id === target.id ? 'a son supprimé son message' : `a supprimé le message de **${target.username}**`}:`)
-            .addFields({ name: 'CHANNEL:', value: `<#${channel}>` })
-            .addFields({ name: 'CONTENT:', value: content })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nTarget = ${target.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Message deleted', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user}` +
+                (executor.id !== target.id ? ` (message from **${target.username}**)` : '') +
+                `\n**Channel** — <#${channel}>\n\u200b`
+            )
+            .addFields({ name: 'Content', value: content.slice(0, 1024) || '*Empty*' })
             .setTimestamp()
-            .setFooter({ text: "🕙" })
             .setColor(color),
 
         memberRole: (executor, target, role, color, sanction, type) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a ${type} le role <@&${role}> à: **${target.username}**\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `${type}`, value: `<@&${role}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nTarget = ${target.id}\nRole = ${role}\`\`\`` })
+            .setAuthor({ name: `Role ${type === 'ADD' || type === 'ADDED' ? 'added' : 'removed'}`, iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Target** — ${target.username} (\`${target.id}\`)\n` +
+                `**Role** — <@&${role}>\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : color),
 
         webhookCreate: (executor, channel, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a créé un webhook\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `CHANNEL`, value: `<#${channel}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Webhook created', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Channel** — <#${channel}>\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : '#F39C12'),
 
         roleCreate: (executor, roleName, roleId, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a créé un role\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `ROLE`, value: `${roleName}` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nRole = ${roleId}\`\`\`` })
+            .setAuthor({ name: 'Role created', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Role** — ${roleName} (\`${roleId}\`)\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : color),
 
         roleDelete: (executor, roleName, roleId, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a supprimé un role\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `ROLE`, value: `${roleName}` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nRole = ${roleId}\`\`\`` })
+            .setAuthor({ name: 'Role deleted', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Role** — ${roleName} (\`${roleId}\`)\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : '#F39C12'),
 
         channelCreate: (executor, channelName, channelId, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a créé un channel\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `CHANNEL`, value: `${channelName}` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channelId}\`\`\`` })
+            .setAuthor({ name: 'Channel created', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Channel** — ${channelName} (\`${channelId}\`)\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : color),
 
         channelDelete: (executor, channelName, channelId, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a supprimé un channel\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `CHANNEL`, value: `${channelName}` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channelId}\`\`\`` })
+            .setAuthor({ name: 'Channel deleted', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Channel** — ${channelName} (\`${channelId}\`)\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : '#F39C12'),
 
         antiDc: (executor, time, limit, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a créé son compte trop récemment\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `TEMPS`, value: `${time}` })
-            .addFields({ name: `LIMITE`, value: `${limit}` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nTime = ${time}\`\`\`` })
+            .setAuthor({ name: 'Account too recent', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**Member** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Created** — ${time}\n` +
+                `**Limit** — \`${limit}\`\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor('#E74C3C'),
 
         botAdd: (executor, bot, id, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a ajouté le bot: **${bot}**\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `BOT`, value: `${bot}` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nBot = ${id}\`\`\`` })
+            .setAuthor({ name: 'Bot added', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Bot** — ${bot} (\`${id}\`)\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : '#F39C12'),
 
         blacklist: (executor, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a rejoins en étant blacklist:\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\n\`\`\`` })
+            .setAuthor({ name: 'Blacklist detected', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**Member** — ${executor.user} (\`${executor.id}\`)\n` +
+                `This member is blacklisted.\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor('#E74C3C'),
 
         changeRegion: (executor, oldRegion, newRegion, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a modifié la région du serveur:\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: 'OLD', value: oldRegion })
-            .addFields({ name: 'NEW', value: newRegion })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\n\`\`\`` })
+            .setAuthor({ name: 'Region changed', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                (sanction ? `**Sanction** — \`${sanction}\`\n` : '') + '\u200b'
+            )
+            .addFields(
+                { name: 'Before', value: oldRegion, inline: true },
+                { name: 'After', value: newRegion, inline: true },
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor(sanction ? '#E74C3C' : '#F39C12'),
 
         antiSpam: (executor, channel, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a été mute pour spam :\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: 'CHANNEL', value: `<#${channel}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Spam detected', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**Member** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Channel** — <#${channel}>\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor('#E74C3C'),
 
         antiLink: (executor, channel, link, color, sanction) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${executor?.user?.username || 'Unknown'} a été posté un lien :\n${!sanction ? '' : `**SANCTION:** ${sanction}`}`)
-            .addFields({ name: 'LINK', value: link })
-            .addFields({ name: 'CHANNEL', value: `<#${channel}>` })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nChannel = ${channel}\`\`\`` })
+            .setAuthor({ name: 'Link detected', iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**Member** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Channel** — <#${channel}>\n` +
+                `**Link** — \`${link.slice(0, 200)}\`\n` +
+                (sanction ? `\n**Sanction** — \`${sanction}\`` : '')
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor('#F39C12'),
 
         mute: (executor, target, time, color, type) => new EmbedBuilder()
-            .setAuthor({ name: executor.user.username, iconURL: executor.user.displayAvatarURL() })
-            .setDescription(`${target?.username || 'Unknown'} a été ${type}:`)
-            .addFields({ name: 'TIME', value: time })
-            .addFields({ name: `ID:`, value: `\`\`\`js\nExecutor = ${executor.id}\nTarget = ${target.id}\`\`\`` })
+            .setAuthor({ name: type.charAt(0).toUpperCase() + type.slice(1), iconURL: executor.user.displayAvatarURL() })
+            .setDescription(
+                `**By** — ${executor.user} (\`${executor.id}\`)\n` +
+                `**Target** — ${target.username} (\`${target.id}\`)\n` +
+                `**Duration** — \`${time}\``
+            )
             .setTimestamp()
-            .setFooter({ text: "🕙" })
-            .setColor(color),
+            .setColor('#F39C12'),
 
         unmute: (target, time, color) => new EmbedBuilder()
             .setAuthor({ name: target.username, iconURL: target.displayAvatarURL() })

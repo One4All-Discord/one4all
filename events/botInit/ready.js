@@ -128,14 +128,29 @@ module.exports = class Ready extends Event {
         // Register slash commands
         try {
             const commands = [
-                new SlashCommandBuilder()
-                    .setName('ping')
-                    .setDescription('Affiche la latence du bot')
-                    .toJSON(),
-            ];
+                new SlashCommandBuilder().setName('ping').setDescription('Affiche la latence du bot'),
+                new SlashCommandBuilder().setName('help').setDescription('Affiche les commandes disponibles'),
+                new SlashCommandBuilder().setName('botinfo').setDescription('Informations sur le bot'),
+                new SlashCommandBuilder().setName('userinfo').setDescription('Informations sur un utilisateur')
+                    .addUserOption(opt => opt.setName('user').setDescription('Utilisateur').setRequired(false)),
+                new SlashCommandBuilder().setName('serverinfo').setDescription('Informations sur le serveur'),
+                new SlashCommandBuilder().setName('ban').setDescription('Bannir un membre')
+                    .addUserOption(opt => opt.setName('user').setDescription('Membre à bannir').setRequired(true))
+                    .addStringOption(opt => opt.setName('reason').setDescription('Raison').setRequired(false))
+                    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers),
+                new SlashCommandBuilder().setName('kick').setDescription('Expulser un membre')
+                    .addUserOption(opt => opt.setName('user').setDescription('Membre à expulser').setRequired(true))
+                    .addStringOption(opt => opt.setName('reason').setDescription('Raison').setRequired(false))
+                    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers),
+                new SlashCommandBuilder().setName('clear').setDescription('Supprimer des messages')
+                    .addIntegerOption(opt => opt.setName('amount').setDescription('Nombre de messages (1-100)').setRequired(true).setMinValue(1).setMaxValue(100))
+                    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+                new SlashCommandBuilder().setName('play').setDescription('Jouer une musique')
+                    .addStringOption(opt => opt.setName('query').setDescription('Titre ou URL').setRequired(true)),
+            ].map(cmd => cmd.toJSON());
             const rest = new REST({ version: '10' }).setToken(client.token);
             await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
-            console.log('[SLASH] Slash commands registered');
+            console.log(`[SLASH] ${commands.length} slash commands registered`);
         } catch (e) {
             console.error('[SLASH]', e.message);
         }
