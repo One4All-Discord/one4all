@@ -24,9 +24,11 @@ module.exports = class Ready extends Event {
                 status = "stream"
             }
 
-            client.getGuildData(newState.guild.id).coinsFarmer.set(newState.id, {
+            const guildData = client.getGuildData(newState.guild.id);
+            const boost = guildData.boost?.[status] || 1;
+            guildData.coinsFarmer.set(newState.id, {
                 status,
-                boost: newState.guild.boost[status]
+                boost
             })
         } else {
 
