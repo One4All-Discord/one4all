@@ -20,7 +20,7 @@ module.exports = class guildRegionUpdate extends Event {
         const isOn = antiraidConfig.enable["regionUpdate"];
         if (!isOn) return;
         let action = await guild.fetchAuditLogs({type: AuditLogEvent.GuildUpdate}).then(async (audit) => audit.entries.first());
-        if (action.changes[0].key !== "name") return;
+        if (!action.changes.some(c => c.key === "preferred_locale" || c.key === "region")) return;
         if (action.executor.id === client.user.id) return console.log(`No sanction oneforall - ${this.name}`);
         if (guild.ownerId === action.executor.id) return console.log(`No sanction crown - ${this.name}`);
 

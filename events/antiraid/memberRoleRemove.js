@@ -20,7 +20,7 @@ module.exports = class Ready extends Event {
 
 
         const antiraidConfig = guildData.antiraid;
-        const isOn = antiraidConfig.enable["roleAdd"];
+        const isOn = antiraidConfig.enable["roleRemove"] !== undefined ? antiraidConfig.enable["roleRemove"] : antiraidConfig.enable["roleAdd"];
         if (!isOn) return;
         let action = await guild.fetchAuditLogs({type: AuditLogEvent.MemberRoleUpdate}).then(async (audit) => audit.entries.first());
         const timeOfAction = action.createdAt.getTime();
@@ -48,7 +48,7 @@ module.exports = class Ready extends Event {
                     }
                 }
             }
-            let sanction = antiraidConfig.config["roleAdd"];
+            let sanction = antiraidConfig.config["roleRemove"] || antiraidConfig.config["roleAdd"];
 
             if (executor.roles.highest.comparePositionTo(guild.members.me.roles.highest) <= 0) {
                 if (sanction === 'ban') {

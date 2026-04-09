@@ -68,7 +68,7 @@ module.exports = class channelUpdate extends Event {
                 if (member.roles.highest.comparePositionTo(guild.members.me.roles.highest) <= 0) {
                     if (sanction === 'ban') {
                         await guild.members.ban(action.executor.id, {reason: `OneForAll - Type : ${this.name}`})
-                    } else if (sanction=== 'kick') {
+                    } else if (sanction === 'kick') {
                         member.kick(
                             `OneForAll - Type: channelUpdate `
                         )

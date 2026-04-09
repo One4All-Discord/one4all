@@ -29,7 +29,7 @@ module.exports = class Ready extends Event{
         let isBotOwner = client.isOwner(action.executor.id);
 
 
-        let isWlBypass = antiraidConfig.bypass[this.name];
+        let isWlBypass = antiraidConfig.bypass["antiKick"];
         if (isWlBypass) var isWl = guild.isGuildWl(action.executor.id);
         if (isGuildOwner || isBotOwner || isWlBypass && isWl) return console.log(`No sanction  ${isWlBypass && isWl ? `whitelisted` : `guild owner list or bot owner`} - CHANNEL CREATE`);
 
@@ -40,11 +40,10 @@ module.exports = class Ready extends Event{
             const logsChannel = guild.channels.cache.get(antiraidLog)
 
             if(!guildData.antiraidLimit.has(action.executor.id)){
-                await guildData.updateAntiraidLimit(action.executor.id, 0, 0, 1).then(res => console.log(res))
+                await guildData.updateAntiraidLimit(action.executor.id, 0, 0, 0);
             }
-            console.log( guildData.antiraidLimit)
             const { deco, ban, kick } = guildData.antiraidLimit.get(action.executor.id)
-            if(kick < kickLimit){
+            if(kick + 1 < kickLimit){
                 await guildData.updateAntiraidLimit(action.executor.id, deco, ban, kick+1);
                 if(logsChannel && !logsChannel.deleted){
                     logsChannel.send(logs.targetExecutorLogs("kick", member, action.target, color, `${kick + 1 === kickLimit ? `Aucun kick restant` : `${kick+1}/${kickLimit}`} before sanction`))

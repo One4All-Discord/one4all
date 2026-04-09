@@ -41,8 +41,8 @@ module.exports = class Message extends Event{
         if (isWlBypass && !isWl || !isWlBypass) {
             const { member } = message;
 
-            if (spammer.has(message.author.id)) {
-                const userData = spammer.get(message.author.id);
+            if (spammer.has(`${message.guild.id}-${message.author.id}`)) {
+                const userData = spammer.get(`${message.guild.id}-${message.author.id}`);
                 const {lastMessage, timer} = userData;
                 const difference = message.createdTimestamp - lastMessage.createdTimestamp;
                 let msgCount = userData.msgCount;
@@ -53,11 +53,11 @@ module.exports = class Message extends Event{
                     userData.msgCount = 1;
                     userData.lastMessage = message;
                     userData.timer = setTimeout(() => {
-                        spammer.delete(message.author.id);
+                        spammer.delete(`${message.guild.id}-${message.author.id}`);
                         // console.log('removed from reset')
 
                     }, TIME)
-                    spammer.set(message.author.id, userData)
+                    spammer.set(`${message.guild.id}-${message.author.id}`, userData)
                 } else {
                     ++msgCount;
                     if (parseInt(msgCount) === LIMIT) {
@@ -67,16 +67,16 @@ module.exports = class Message extends Event{
                         if(channel && !channel.deleted) channel.send(logs.antiSpam(message.member, message.channel.id, color, 'mute'))
                     } else {
                         userData.msgCount = msgCount;
-                        spammer.set(message.author.id, userData);
+                        spammer.set(`${message.guild.id}-${message.author.id}`, userData);
                     }
                 }
             } else {
                 let fn = () => setTimeout(() => {
-                    spammer.delete(message.author.id);
+                    spammer.delete(`${message.guild.id}-${message.author.id}`);
                     // console.log('removed from map')
 
                 }, TIME)
-                spammer.set(message.author.id, {
+                spammer.set(`${message.guild.id}-${message.author.id}`, {
                     msgCount: 1,
                     lastMessage: message,
                     timer: fn

@@ -37,12 +37,11 @@ module.exports = class Ready extends Event{
             const logsChannel = guild.channels.cache.get(antiraidLog)
 
             if(!guildData.antiraidLimit.has(action.executor.id)){
-                await guildData.updateAntiraidLimit(action.executor.id, 0, 1, 0);
-
+                await guildData.updateAntiraidLimit(action.executor.id, 0, 0, 0);
             }
             const { deco, ban: banCount, kick } = guildData.antiraidLimit.get(action.executor.id)
 
-            if(banCount < banLimit){
+            if(banCount + 1 < banLimit){
                 await guildData.updateAntiraidLimit(action.executor.id, deco, banCount+1, kick);
                 if(logsChannel && !logsChannel.deleted){
                     logsChannel.send(logs.targetExecutorLogs("ban", member, action.target, color, `${banCount + 1 === banLimit ? `Aucun ban restant` : `${banCount+1}/${banLimit}`} before sanction`))

@@ -52,13 +52,13 @@ module.exports = class Message extends Event{
                 }
                 if(!muteRoleId || !muteRole || muteRole.deleted || muteRole.managed) return;
 
-                if(!spammer.has(message.author.id)) {
-                    spammer.set(message.author.id, 1)
+                if(!spammer.has(`${message.guild.id}-${message.author.id}`)) {
+                    spammer.set(`${message.guild.id}-${message.author.id}`, 1)
                 }else{
-                    const data = spammer.get(message.author.id)
-                    spammer.set(message.author.id, data + 1);
+                    const data = spammer.get(`${message.guild.id}-${message.author.id}`)
+                    spammer.set(`${message.guild.id}-${message.author.id}`, data + 1);
                 }
-                if(spammer.get(message.author.id) > 5){
+                if(spammer.get(`${message.guild.id}-${message.author.id}`) > 5){
                     const { muteRoleId } = guildData.config;
                     const muteRole = message.guild.roles.cache.get(muteRoleId);
                     if(!muteRoleId || !muteRole || muteRole.deleted || muteRole.managed) return;

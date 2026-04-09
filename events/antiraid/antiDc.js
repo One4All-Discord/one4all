@@ -19,8 +19,17 @@ module.exports = class AntiDc extends Event {
         let {logs} = client.lang(guildData.lang)
         const isOn = antiraidConfig.enable["antiDc"];
         if (!isOn) return;
+
+        // Whitelist/bypass check
+        if (guild.ownerId === member.user.id) return;
+        let isGuildOwner = guildData.isGuildOwner(member.user.id);
+        let isBotOwner = client.isOwner(member.user.id);
+        let isWlBypass = antiraidConfig.bypass["antiDc"];
+        if (isWlBypass) var isWl = guild.isGuildWl(member.user.id);
+        if (isGuildOwner || isBotOwner || (isWlBypass && isWl)) return;
+
         const limit = ms(antiraidConfig.config["antiDcLimit"]);
-        const user = client.users.cache.get(member.user.id)
+        const user = client.users.cache.get(member.user.id);
         const time = Date.now() - user.createdAt;
         if (time < limit){
             const logsChannel = guild.channels.cache.get(antiraidLog)
