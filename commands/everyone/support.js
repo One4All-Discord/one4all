@@ -1,6 +1,8 @@
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { PermissionFlagsBits } = require('discord.js');
+const Embed = require('../../structures/Embed');
 const Command = require('../../structures/Handler/Command');
-module.exports = class Test extends Command {
+
+module.exports = class Support extends Command {
     constructor() {
         super({
             name: 'support',
@@ -14,15 +16,14 @@ module.exports = class Test extends Command {
 
     async run(client, message, args) {
         const guildData = client.getGuildData(message.guild.id);
-        const color = guildData.color
-        const lang = client.lang(guildData.lang)
-        const embed = new EmbedBuilder()
-            .setAuthor({ name: lang.support.support, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-            .setColor(`${color}`)
-            .setTimestamp()
-            .setFooter({ text: lang.support.support, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-            .setDescription(`[\`${lang.clic}\`](https://discord.gg/h69YZHB7Nh)`)
-        message.channel.send({ embeds: [embed] });
+
+        const embed = new Embed(client, guildData)
+            .setAuthor({ name: 'Serveur Support', iconURL: client.user.displayAvatarURL() })
+            .setThumbnail(client.user.displayAvatarURL({ size: 256 }))
+            .setDescription(
+                `Rejoins le serveur officiel pour obtenir de l'aide,\nsignaler un bug ou suivre les mises à jour.\n\u200b\n` +
+                `**[Rejoindre le support](https://discord.gg/TfwGcCjyfp)**`
+            );
+        message.reply({ embeds: [embed] });
     }
 };
-

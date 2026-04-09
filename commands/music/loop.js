@@ -21,7 +21,7 @@ module.exports = class Loop extends Command {
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours de lecture.');
         }
 
         const modes = {
@@ -41,7 +41,7 @@ module.exports = class Loop extends Command {
 
         const input = args[0]?.toLowerCase();
         if (!input || !(input in modes)) {
-            return message.channel.send('Modes disponibles: `off`, `track`, `queue`, `autoplay`.');
+            return message.reply('Modes disponibles: `off`, `track`, `queue`, `autoplay`.');
         }
 
         const mode = modes[input];
@@ -50,6 +50,6 @@ module.exports = class Loop extends Command {
         const embed = new Embed(client, guildData)
             .setDescription(`Mode de répétition: **${modeNames[mode]}**.`);
 
-        message.channel.send({ embeds: [embed] });
+        message.reply({ embeds: [embed] });
     }
 };

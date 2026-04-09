@@ -17,14 +17,14 @@ module.exports = class Test extends Command{
         const lang = client.lang(guildData.lang);
         const member = message.mentions.members.first() || await message.guild.members.cache.get(args[0]) || await message.guild.members.fetch(args[0])
 
-        if(!member) return message.channel.send(lang.addinvite.noMember)
+        if(!member) return message.reply(lang.addinvite.noMember)
         const numberToAdd = args[1];
-        if(!numberToAdd) return message.channel.send(lang.addinvite.noNumber)
+        if(!numberToAdd) return message.reply(lang.addinvite.noNumber)
         let count = client.getMemberData(message.guild.id, member.user?.id || member.id).invite;
         count.join += parseInt(numberToAdd);
         count.bonus += parseInt(numberToAdd)
         client.getMemberData(message.guild.id, member.user?.id || member.id).updateInvite = count;
-        message.channel.send(lang.addinvite.success(numberToAdd, member.user.username))
+        message.reply(lang.addinvite.success(numberToAdd, member.user.username))
 
 
     }

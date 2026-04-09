@@ -21,9 +21,9 @@ module.exports = class Test extends Command {
         const color = guildData.color
         const lang = client.lang(guildData.lang)
         let member = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
-        if (member === message.member) return message.channel.send(lang.kick.noKick)
-        if (!member) return message.channel.send(lang.kick.noKick)
-        if (member.roles.highest.comparePositionTo(message.member.roles.highest) >= 0) return message.channel.send(lang.errorRl(member.user.username))
+        if (member === message.member) return message.reply(lang.kick.noKick)
+        if (!member) return message.reply(lang.kick.noKick)
+        if (member.roles.highest.comparePositionTo(message.member.roles.highest) >= 0) return message.reply(lang.errorRl(member.user.username))
 
         let reason = args[1];
         if (!reason) reason = lang.kick.noReason;
@@ -100,10 +100,10 @@ module.exports = class Test extends Command {
 
                     }
                 }
-                message.channel.send(lang.kick.success(member));
+                message.reply(lang.kick.success(member));
             }
         }).catch(() => {
-            message.channel.send(lang.kick.error(member));
+            message.reply(lang.kick.error(member));
         })
 
     }

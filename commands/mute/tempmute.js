@@ -24,22 +24,22 @@ module.exports = class Test extends Command {
         const guildData = client.getGuildData(message.guild.id);
         const lang = client.lang(guildData.lang)
         let isSetup = message.guild.setup;
-        if (!isSetup) return message.channel.send(lang.error.noSetup);
+        if (!isSetup) return message.reply(lang.error.noSetup);
 
         const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
-        if (!member) return message.channel.send(lang.tempmute.errorNoMember);
+        if (!member) return message.reply(lang.tempmute.errorNoMember);
 
         const muteRole = message.guild.roles.cache.get(guildData.config.muteRoleId);
-        if (!muteRole) return message.channel.send(lang.tempmute.errorCantFindRole);
+        if (!muteRole) return message.reply(lang.tempmute.errorCantFindRole);
 
         const time = args[1];
-        if (!time || isNaN(ms(time))) return message.channel.send(lang.tempmute.errorTime);
+        if (!time || isNaN(ms(time))) return message.reply(lang.tempmute.errorTime);
 
-        if (member.roles.cache.has(muteRole.id)) return message.channel.send(lang.tempmute.errorAlreadyMute(member));
+        if (member.roles.cache.has(muteRole.id)) return message.reply(lang.tempmute.errorAlreadyMute(member));
         member.roles.add(muteRole, `Mute by ${message.author.username}`).then(async () => {
             const color = guildData.color
 
-            message.channel.send(lang.tempmute.success(member, time));
+            message.reply(lang.tempmute.success(member, time));
 
             const timeLenght = time.split('').length
             const numberT = parseInt(time.slice(0, timeLenght - 1))

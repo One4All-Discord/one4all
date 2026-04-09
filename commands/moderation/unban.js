@@ -23,7 +23,7 @@ module.exports = class Test extends Command {
         const color = guildData.color
         if (args[0] === 'all') {
             const bans = await message.guild.bans.fetch();
-            if (bans.size < 1) return message.channel.send(lang.unban.noUnBanAll).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (bans.size < 1) return message.reply(lang.unban.noUnBanAll).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
             bans.forEach(ban => {
                 message.guild.members.unban(ban.user.id, `Unban all par ${message.author.username}`)
             })
@@ -31,14 +31,14 @@ module.exports = class Test extends Command {
 
         } else {
             const user = message.mentions.users.first() || await client.users.fetch(args[0]).catch(async err => {
-                return await message.channel.send(lang.unban.noMember).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+                return await message.reply(lang.unban.noMember).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
             })
             if (user.id === message.author.id) {
-                return await message.channel.send(lang.unban.unbanSelf).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+                return await message.reply(lang.unban.unbanSelf).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
             }
             const banned = await message.guild.bans.fetch();
             if (!banned.has(user.id)) {
-                return message.channel.send(lang.unban.notBan(user)).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+                return message.reply(lang.unban.notBan(user)).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
             }
 
             let reason = args.slice(1).join(" ");
@@ -46,7 +46,7 @@ module.exports = class Test extends Command {
                 reason = `Unban par ${message.author.username}`
             }
             message.guild.members.unban(user.id, reason).then(() => {
-                message.channel.send(lang.unban.success(user))
+                message.reply(lang.unban.success(user))
             })
 
         }

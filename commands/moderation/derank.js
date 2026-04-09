@@ -1,9 +1,8 @@
-
-const logsChannelId = new Map();
 const Command = require('../../structures/Handler/Command');
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const Embed = require('../../structures/Embed');
+const { PermissionFlagsBits } = require('discord.js');
 
-module.exports = class Test extends Command{
+module.exports = class Derank extends Command {
     constructor() {
         super({
             name: 'derank',
@@ -14,48 +13,30 @@ module.exports = class Test extends Command{
             userPermissions: [PermissionFlagsBits.Administrator],
             clientPermissions: [PermissionFlagsBits.ManageRoles],
             cooldown: 5
-
         });
     }
-    async run(client, message,args){
 
-    const guildData = client.getGuildData(message.guild.id);
-    const lang = client.lang(guildData.lang)
-    const color = guildData.color
-    let memberss = await message.mentions.members.first()
-    let member;
-    await message.guild.members.fetch().then((members) =>{
-        member = members.get(args[0]) || members.get(memberss.id)
-    });
-    if (!member) return message.channel.send(lang.derank.errorNoMember)
-    if(member.user.id === client.user.id) return message.channel.send(lang.derank.errorUnrankMe)
-    if(member.roles.highest.comparePositionTo(message.member.roles.highest) >= 0 && message.guild.ownerId != message.author.id)  return message.channel.send(lang.derank.errorRl(member))
-    if (member.user.id === message.author.id) return message.channel.send(lang.derank.errorUnrankself);
-    let roles = []
-    let role = await member.roles.cache
-        .map(role => roles.push(role.id))
-    role
-    if(roles.length === 1) return message.channel.send(lang.derank.errorNoRl(member));
-    member.roles.remove(roles, lang.derank.reason(message.member)).then(() =>{
-        let logChannelId = logsChannelId.get(message.guild.id);
-        if (logChannelId != undefined) {
-            let logChannel = message.guild.channels.cache.get(logChannelId)
-            const logsEmbed = new EmbedBuilder()
-				.setTitle("\`❌\` Derank d'un membre")
-				.setDescription(`
-					\`👨‍💻\` Auteur : **${message.author.username}** \`(${message.author.id})\` a derank :\n
-                    \`\`\`${member.user.username} (${member.user.id})\`\`\`
+    async run(client, message, args) {
+        const guildData = client.getGuildData(message.guild.id);
+        const lang = client.lang(guildData.lang);
 
-					`)
-				.setTimestamp()
-				.setFooter({ text: "🕙" })
-				.setColor(`${color}`)
+        let memberss = await message.mentions.members.first();
+        let member;
+        await message.guild.members.fetch().then((members) => {
+            member = members.get(args[0]) || members.get(memberss.id);
+        });
 
-				.setTimestamp()
-				.setFooter({ text: "🕙" })
-				.setColor(`${color}`)
-			logChannel.send({ embeds: [logsEmbed] })
-        }
-        return message.channel.send(lang.derank.success(member))
-    })
-}}
+        if (!member) return message.reply(lang.derank.errorNoMember);
+        if (member.user.id === client.user.id) return message.reply(lang.derank.errorUnrankMe);
+        if (member.roles.highest.comparePositionTo(message.member.roles.highest) >= 0 && message.guild.ownerId != message.author.id) return message.reply(lang.derank.errorRl(member));
+        if (member.user.id === message.author.id) return message.reply(lang.derank.errorUnrankself);
+
+        let roles = [];
+        member.roles.cache.map(role => roles.push(role.id));
+        if (roles.length === 1) return message.reply(lang.derank.errorNoRl(member));
+
+        member.roles.remove(roles, lang.derank.reason(message.member)).then(() => {
+            return message.reply(lang.derank.success(member));
+        });
+    }
+};

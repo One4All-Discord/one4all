@@ -9,16 +9,16 @@ module.exports = class presenceUpdate extends Event {
     }
 
     async run(client, oldMember, newMember) {
-        if (!client.botperso) return;
+        if (!oldMember || !newMember || !newMember.user) return;
         client.guilds.cache.forEach(guild => {
 
-            if (!oldMember) return;
             const guildData = client.getGuildData(guild.id);
             const msg = guildData.config.soutienMsg
             const roleId = guildData.config.soutienId
             const role = guild.roles.cache.get(roleId)
             if (!role) return;
             const isOn = guildData.config.soutienOn;
+            if (!newMember.user.presence) return;
             let status = newMember.user.presence.activities.map(a => a.state)
             if (guild.members.cache.get(newMember.user.id) === undefined) return;
 

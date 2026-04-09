@@ -17,36 +17,33 @@ module.exports = class Queue extends Command {
 
     async run(client, message, args) {
         const guildData = client.getGuildData(message.guild.id);
-        const lang = client.lang(guildData.lang);
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours.');
         }
 
         const current = queue.currentTrack;
-        const tracks = queue.tracks.toArray().slice(0, 15);
+        const tracks = queue.tracks.toArray().slice(0, 10);
 
-        let description = `**En lecture:**\n[${current.title}](${current.url}) - \`${current.duration}\`\n\n`;
+        let desc = `🎵 **En lecture**\n[${current.title}](${current.url}) · \`${current.duration}\`\n\u200b\n`;
 
         if (tracks.length > 0) {
-            description += `**File d'attente:**\n`;
-            description += tracks.map((track, i) =>
-                `**${i + 1}.** [${track.title}](${track.url}) - \`${track.duration}\``
+            desc += tracks.map((t, i) =>
+                `\`${i + 1}.\` [${t.title}](${t.url}) · \`${t.duration}\``
             ).join('\n');
+            desc += '\n';
         } else {
-            description += "La file d'attente est vide.";
+            desc += '*Rien en file d\'attente*\n';
         }
 
-        const totalTracks = queue.tracks.size;
-        if (totalTracks > 15) {
-            description += `\n\n... et **${totalTracks - 15}** autre(s) musique(s).`;
+        if (queue.tracks.size > 10) {
+            desc += `\n+**${queue.tracks.size - 10}** autres pistes`;
         }
 
         const embed = new Embed(client, guildData)
-            .setAuthor({ name: "File d'attente" })
-            .setDescription(description);
-
-        message.channel.send({ embeds: [embed] });
+            .setAuthor({ name: "File d'attente", iconURL: client.user.displayAvatarURL() })
+            .setDescription(desc);
+        message.reply({ embeds: [embed] });
     }
 };

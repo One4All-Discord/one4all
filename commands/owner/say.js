@@ -19,7 +19,7 @@ module.exports = class Test extends Command {
         const lang = client.lang(guildData.lang)
         const toSay = args.slice(0).join(' ')
         await message.delete()
-        if (toSay.length < 1) return message.channel.send(lang.say.cantSendEmptyMsg).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-        message.channel.send(toSay)
+        if (toSay.length < 1) return message.reply(lang.say.cantSendEmptyMsg).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+        message.reply(toSay)
     }
 }

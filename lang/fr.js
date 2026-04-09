@@ -74,7 +74,7 @@ module.exports = {
         > 🔇 Mute micro : **${muteCount}**\n\n➡️ Total de personnes en vocal : **${count}**`,
     },
     authorinfo: {
-        description: `__**OneforAll**__\n\n*OneforAll est un bot appartenant à* \`KhdDev\`\n\n**Developpeur :**\n[KhdDev](https://discord.gg/h69YZHB7Nh) -> Bot & Host\n`,
+        description: `__**OneforAll**__\n\n*OneforAll est un bot appartenant à* \`KhdDev\`\n\n**Developpeur :**\n[KhdDev](https://discord.gg/TfwGcCjyfp) -> Bot & Host\n`,
     },
     alladmins: {
         error: `Aucun admin sur ce serveur.`,
@@ -413,7 +413,7 @@ module.exports = {
         successChange: `Vous avez bien modifié votre mot de pass !`
     },
     authorinfo: {
-        description: `__**OneforAll**__\n\n*OneforAll est un bot appartenant à* \`KhdDev\`\n\n**Developpeur :**\n[KhdDev](https://discord.gg/h69YZHB7Nh) -> Bot & Host\n`,
+        description: `__**OneforAll**__\n\n*OneforAll est un bot appartenant à* \`KhdDev\`\n\n**Developpeur :**\n[KhdDev](https://discord.gg/TfwGcCjyfp) -> Bot & Host\n`,
     },
     setlang: {
         title: `Changer la langue`,

@@ -1,7 +1,7 @@
-const { EmbedBuilder } = require('discord.js');
-
+const Embed = require('../../structures/Embed');
 const Command = require('../../structures/Handler/Command');
-module.exports = class Test extends Command {
+
+module.exports = class Pic extends Command {
     constructor() {
         super({
             name: 'pic',
@@ -9,25 +9,21 @@ module.exports = class Test extends Command {
             usage: 'pic [user]',
             aliases: ['pp', 'avatar'],
             cooldown: 5
-
         });
     }
+
     async run(client, message, args) {
         const guildData = client.getGuildData(message.guild.id);
-        const color = guildData.color
-        const lang = client.lang(guildData.lang)
         let user = message.mentions.users.first();
-        if (!isNaN(args[0])) user = await client.users.fetch(args[0]).catch()
+        if (!isNaN(args[0])) user = await client.users.fetch(args[0]).catch(() => null);
         if (!user) user = message.author;
-        const avatarURL = user.displayAvatarURL({size: 512}).replace(".webp", ".png");
-        if (message.content.includes("-v")) message.channel.send("<" + avatarURL + ">");
-        const embed = new EmbedBuilder()
-            .setTitle(user.username)
-            .setImage(avatarURL)
-            .setColor(`${color}`)
-            .setTimestamp()
-            .setFooter({ text: client.user.username })
-        message.channel.send({ embeds: [embed] });
+
+        const avatarURL = user.displayAvatarURL({ size: 512 }).replace('.webp', '.png');
+        if (message.content.includes('-v')) message.reply('<' + avatarURL + '>');
+
+        const embed = new Embed(client, guildData)
+            .setAuthor({ name: user.username, iconURL: avatarURL })
+            .setImage(avatarURL);
+        message.reply({ embeds: [embed] });
     }
 };
-

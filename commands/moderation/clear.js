@@ -32,7 +32,7 @@ module.exports = class Test extends Command{
     message.delete();
     let msg;
     message.channel.bulkDelete(deleteAmount + 1, true).then(async () =>{
-        msg = await message.channel.send(lang.clear.success(deleteAmount))
+        msg = await message.reply(lang.clear.success(deleteAmount))
         setTimeout(() =>{
             msg.delete();
         }, 5000)

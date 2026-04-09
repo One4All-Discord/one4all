@@ -20,42 +20,42 @@ module.exports = class Test extends Command {
         const lang = client.lang(guildData.lang)
 
 
-        message.channel.send(lang.setup.muteQ)
+        message.reply(lang.setup.muteQ)
         const responseMuteRole = await message.channel.awaitMessages({ filter: m => m.author.id === message.author.id,
             max: 1,
             time: 30000
         }).catch(() => {
-            message.channel.send("Opération annulée pas de réponse après 30s")
+            message.reply("Opération annulée pas de réponse après 30s")
         })
         if (!responseMuteRole || !responseMuteRole.first()) return;
         const CollectedMuteRole = responseMuteRole.first()
-        if (CollectedMuteRole.content.toLowerCase() === "cancel") return message.channel.send(lang.cancel)
+        if (CollectedMuteRole.content.toLowerCase() === "cancel") return message.reply(lang.cancel)
 
 
-        message.channel.send(lang.setup.memberRoleQ)
+        message.reply(lang.setup.memberRoleQ)
         const responseMembreRole = await message.channel.awaitMessages({ filter: m => m.author.id === message.author.id,
             max: 1,
             time: 30000
         }).catch(() => {
-            message.channel.send("Opération annulée pas de réponse après 30s")
+            message.reply("Opération annulée pas de réponse après 30s")
         })
         if (!responseMembreRole || !responseMembreRole.first()) return;
         const CollectedMembreRole = responseMembreRole.first()
-        if (CollectedMembreRole.content.toLowerCase() === "cancel") return message.channel.send(lang.cancel)
+        if (CollectedMembreRole.content.toLowerCase() === "cancel") return message.reply(lang.cancel)
 
 
         let muteRole = CollectedMuteRole.mentions.roles.first() || message.guild.roles.cache.get(CollectedMuteRole.content);
         let muteRoleId = muteRole.id;
-        if(!muteRole) return  message.channel.send(lang.setup.dontFindMute)
+        if(!muteRole) return  message.reply(lang.setup.dontFindMute)
 
         let memberRole = CollectedMembreRole.mentions.roles.first() || message.guild.roles.cache.get(CollectedMembreRole.content);
         let memberRoleId = memberRole.id
-        if(!memberRole) return message.channel.send(lang.setup.dontFindMember)
+        if(!memberRole) return message.reply(lang.setup.dontFindMember)
 
         try {
 
             await guildData.updateSetup(muteRoleId, memberRoleId)
-            message.channel.send(lang.setup.success(muteRoleId, memberRoleId))
+            message.reply(lang.setup.success(muteRoleId, memberRoleId))
             message.guild.channels.cache.forEach(channel => {
                 if (channel.type === ChannelType.GuildText) {
                     channel.permissionOverwrites.edit(muteRole, {
@@ -71,7 +71,7 @@ module.exports = class Test extends Command {
             })
         } catch (err) {
             console.log(err)
-            message.channel.send(lang.setup.error(muteRoleId, memberRole))
+            message.reply(lang.setup.error(muteRoleId, memberRole))
         }
     }
 }

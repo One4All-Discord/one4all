@@ -7,7 +7,7 @@ module.exports = class Pause extends Command {
     constructor() {
         super({
             name: 'pause',
-            description: 'Mettre en pause ou reprendre la musique',
+            description: 'Mettre en pause la musique',
             usage: '!pause',
             category: 'music',
             clientPermissions: [PermissionFlagsBits.EmbedLinks],
@@ -16,19 +16,17 @@ module.exports = class Pause extends Command {
 
     async run(client, message, args) {
         const guildData = client.getGuildData(message.guild.id);
-        const lang = client.lang(guildData.lang);
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours.');
         }
 
         queue.node.setPaused(!queue.node.isPaused);
+        const paused = queue.node.isPaused;
 
-        const status = queue.node.isPaused ? 'mise en pause' : 'reprise';
         const embed = new Embed(client, guildData)
-            .setDescription(`La musique a été **${status}**.`);
-
-        message.channel.send({ embeds: [embed] });
+            .setAuthor({ name: paused ? 'Musique en pause' : 'Musique reprise', iconURL: client.user.displayAvatarURL() });
+        message.reply({ embeds: [embed] });
     }
 };

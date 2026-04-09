@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 const Command = require('../../structures/Handler/Command');
@@ -35,26 +36,26 @@ module.exports = class Test extends Command {
         let shop;
         if(guildData.shop)  shop = [...guildData.shop ]
         if (args[0] === "create") {
-            if (shop) return message.channel.send(lang.addShop.alreadyShop)
+            if (shop) return message.reply(lang.addShop.alreadyShop)
 
             await guildData.createShop().then(() => {
                 shop = [{id: 0, item: lang.addShop.nothingInShop, price: undefined, role: undefined}]
             })
 
 
-            return message.channel.send(lang.addShop.create).then(mp => setTimeout(() => mp.delete().catch(() => {}), 5000))
+            return message.reply(lang.addShop.create).then(mp => setTimeout(() => mp.delete().catch(() => {}), 5000))
         } else if (args[0] === "delete") {
-            if(!guildData.shop) return message.channel.send(lang.addShop.noShop)
+            if(!guildData.shop) return message.reply(lang.addShop.noShop)
 
 
 
             
             return await guildData.deleteShop().then(() => {
-                message.channel.send(lang.addShop.delete).then(mp => setTimeout(() => mp.delete().catch(() => {}), 5000))
+                message.reply(lang.addShop.delete).then(mp => setTimeout(() => mp.delete().catch(() => {}), 5000))
             })
 
         }
-        if(!guildData.shop) return message.channel.send(lang.addShop.noShop)
+        if(!guildData.shop) return message.reply(lang.addShop.noShop)
         const actualShop = shop.filter(shop => shop.price !== undefined)
         if (args[0] === 'add') {
             /**
@@ -65,9 +66,9 @@ module.exports = class Test extends Command {
              **/
             const itemName = args.slice(1, args.length - 1).join(" ")
             const price = args[args.length - 1]
-            if (!itemName) return message.channel.send(lang.addShop.noItem).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-            if (!price || isNaN(price)) return message.channel.send(lang.addShop.noPrice).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-            if (parseInt(price) === 0) return message.channel.send(lang.addShop.priceInf0).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (!itemName) return message.reply(lang.addShop.noItem).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (!price || isNaN(price)) return message.reply(lang.addShop.noPrice).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (parseInt(price) === 0) return message.reply(lang.addShop.priceInf0).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
             const isRl = !message.mentions.roles.first() ? undefined : !isNaN(args[1]) ? message.guild.roles.cache.get(args[1]) : message.mentions.roles.first();
 
             if (isRl) {
@@ -98,16 +99,16 @@ module.exports = class Test extends Command {
             shop = actualShop
 
             await guildData.updateShop(actualShop)
-            return message.channel.send(lang.addShop.successAdd(itemName, price)).then(mp => {
+            return message.reply(lang.addShop.successAdd(itemName, price)).then(mp => {
                 showShop(actualShop)
                 setTimeout(() => mp.delete().catch(() => {}), 5000)
             })
 
 
         } else if (args[0] === "remove") {
-            if (!args[1]) return message.channel.send(lang.addShop.noIdToDelete).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-            if (isNaN(args[1])) return message.channel.send(lang.addShop.onlyNumber).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-            if (!actualShop.find(shop => shop.id === parseInt(args[1]))) return message.channel.send(lang.addShop.notFoundItem).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (!args[1]) return message.reply(lang.addShop.noIdToDelete).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (isNaN(args[1])) return message.reply(lang.addShop.onlyNumber).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (!actualShop.find(shop => shop.id === parseInt(args[1]))) return message.reply(lang.addShop.notFoundItem).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
             let newShop = actualShop.filter(shop => shop.id !== parseInt(args[1]));
             const itemRemove = actualShop.filter(shop => shop.id === parseInt(args[1]));
             console.log(newShop)
@@ -126,7 +127,7 @@ module.exports = class Test extends Command {
 
 
 
-            return await message.channel.send(lang.addShop.successRemove(itemRemove[0].item)).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000)).then(() => {
+            return await message.reply(lang.addShop.successRemove(itemRemove[0].item)).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000)).then(() => {
                 showShop(newShop)
 
             })
@@ -135,19 +136,19 @@ module.exports = class Test extends Command {
         } else if (!args[0]) {
             showShop(shop)
         } else if (args[0] === 'edit') {
-            if (!client.isGuildOwner(guildData.owners, message.author.id) && owner !== message.author.id && !client.isOwner(message.author.id)) return message.channel.send(lang.error.notListOwner)
-            if (!args[1]) return message.channel.send(lang.addShop.syntaxEdit).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-            if (isNaN(args[1])) return message.channel.send(lang.addShop.onlyNumber).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-            if (!actualShop.find(shop => shop.id === parseInt(args[1]))) return message.channel.send(lang.addShop.notFoundItem).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (!client.isGuildOwner(guildData.owners, message.author.id) && owner !== message.author.id && !client.isOwner(message.author.id)) return message.reply(lang.error.notListOwner)
+            if (!args[1]) return message.reply(lang.addShop.syntaxEdit).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (isNaN(args[1])) return message.reply(lang.addShop.onlyNumber).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (!actualShop.find(shop => shop.id === parseInt(args[1]))) return message.reply(lang.addShop.notFoundItem).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
             const itemToEdit = actualShop.filter(shop => shop.id === parseInt(args[1]));
-            const editMsg = await message.channel.send(lang.loading)
+            const editMsg = await message.reply(lang.loading)
             const emoji = ['🎫', '💰', '❌', '✅']
             for (const em of emoji) await editMsg.react(em) // react to msg with emoji list
             const filter = (reaction, user) => emoji.includes(reaction.emoji.name) && user.id === message.author.id,
                 dureefiltrer = response => {
                     return response.author.id === message.author.id
                 };
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setTitle(itemToEdit[0].item)
                 .setDescription(`
             ${lang.addShop.editCondition}
@@ -159,19 +160,17 @@ module.exports = class Test extends Command {
 
             ${emoji[3]} : SAVE
         `)
-                .setTimestamp()
-                .setColor(`${color}`)
                 .setFooter({ text: `OneForAll Shop`, iconURL: client.user.displayAvatarURL() })
             editMsg.edit({ embeds: [embed] }).then(async m => {
                 const collector = m.createReactionCollector({ filter: filter, time: 900000});
                 collector.on('collect', async r => {
                     await r.users.remove(message.author);
                     if (r.emoji.name === emoji[0]) {
-                        message.channel.send(lang.addShop.newNameQ).then(mp => {
+                        message.reply(lang.addShop.newNameQ).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(cld => {
                                     let msg = cld.first();
-                                    if (msg.content === "cancel") return message.channel.send(lang.cancel).then(mps => {
+                                    if (msg.content === "cancel") return message.reply(lang.cancel).then(mps => {
                                         setTimeout(() => {
                                             msWriteProfilerMark.delete();
                                             msg.delete();
@@ -186,7 +185,7 @@ module.exports = class Test extends Command {
                                         itemToEdit[0].item = msg.content;
                                         itemToEdit[0].role = false;
                                     }
-                                    message.channel.send(lang.addShop.successEditItemName(msg.content)).then((mps) => {
+                                    message.reply(lang.addShop.successEditItemName(msg.content)).then((mps) => {
                                         updateEmbed()
                                         setTimeout(() => {
                                             mps.delete();
@@ -198,13 +197,13 @@ module.exports = class Test extends Command {
                                 });
                         })
                     } else if (r.emoji.name === emoji[1]) {
-                        message.channel.send(lang.addShop.newPriceQ).then(mp => {
+                        message.reply(lang.addShop.newPriceQ).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(cld => {
                                     let msg = cld.first();
-                                    if (isNaN(msg.content)) return message.channel.send(lang.addShop.noPrice).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-                                    if (parseInt(msg.content) === 0) return message.channel.send(lang.addShop.priceInf0).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-                                    message.channel.send(lang.addShop.successEditItemPrice(msg.content)).then((mps) => {
+                                    if (isNaN(msg.content)) return message.reply(lang.addShop.noPrice).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+                                    if (parseInt(msg.content) === 0) return message.reply(lang.addShop.priceInf0).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+                                    message.reply(lang.addShop.successEditItemPrice(msg.content)).then((mps) => {
                                         itemToEdit[0].price = parseInt(msg.content);
                                         updateEmbed()
                                         setTimeout(() => {
@@ -217,7 +216,7 @@ module.exports = class Test extends Command {
                                 });
                         })
                     } else if (r.emoji.name === emoji[2]) {
-                        message.channel.send(lang.addShop.cancel).then((mps) => {
+                        message.reply(lang.addShop.cancel).then((mps) => {
                             collector.stop();
                             setTimeout(() => {
                                 mps.delete();
@@ -226,11 +225,11 @@ module.exports = class Test extends Command {
                             }, 2000)
                         })
                     } else if (r.emoji.name === emoji[3]) {
-                        if (actualShop.filter(shop => shop.id === parseInt(args[1])) === itemToEdit) return message.channel.send(lang.addShop.noModification);
+                        if (actualShop.filter(shop => shop.id === parseInt(args[1])) === itemToEdit) return message.reply(lang.addShop.noModification);
                         actualShop[itemToEdit[0].id - 1] = itemToEdit[0];
 
                         guildData.updateShop(actualShop).then(() => {
-                            message.channel.send(lang.addShop.successEdit).then(() => {
+                            message.reply(lang.addShop.successEdit).then(() => {
                                 shop.get(message.guild.id, actualShop);
                                 ajustShopId(actualShop);
                                 showShop(actualShop);
@@ -259,16 +258,14 @@ module.exports = class Test extends Command {
         }
 
         function showShop(shop) {
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setAuthor({ name: message.author.username, iconURL: message.author.displayAvatarURL() })
                 .setDescription(lang.addShop.shopDesc(message.guild.name))
-                .addFields({ name: '\u200b', value: shop.map(shop => !shop.price ? lang.addShop.nothingInShop : `\`${shop.id}\` ${shop.item} — [⏣ ${shop.price.toLocaleString()}](https://discord.gg/h69YZHB7Nh) coins`).toString() })
-                .setColor(`${color}`)
-                .setTimestamp()
+                .addFields({ name: '\u200b', value: shop.map(shop => !shop.price ? lang.addShop.nothingInShop : `\`${shop.id}\` ${shop.item} — [⏣ ${shop.price.toLocaleString()}](https://discord.gg/TfwGcCjyfp) coins`).toString() })
                 .setFooter({ text: `⏣ OneForAll coins` });
 
 
-            return message.channel.send({ embeds: [embed] })
+            return message.reply({ embeds: [embed] })
         }
     }
 };

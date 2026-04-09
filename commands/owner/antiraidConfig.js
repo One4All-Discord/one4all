@@ -23,13 +23,25 @@ module.exports = class Test extends Command {
         let lang = client.lang(guildData.lang);
 
         const color = parseInt(guildData.color.replace('#', ''), 16)
+        if (!args[0]) {
+            const Embed = require('../../structures/Embed');
+            const embed = new Embed(client, guildData)
+                .setAuthor({ name: 'Anti-Raid', iconURL: client.user.displayAvatarURL() })
+                .setDescription(
+                    `\`antiraid on\` — Activer tout l'antiraid\n` +
+                    `\`antiraid off\` — Désactiver tout l'antiraid\n` +
+                    `\`antiraid opti\` — Configuration optimale\n` +
+                    `\`antiraid config\` — Configuration détaillée\n`
+                );
+            return message.reply({ embeds: [embed] });
+        }
         if (args[0] === "on") {
             const {enable} = guildData.antiraid;
             for (const [name, _] of Object.entries(enable)) {
                 enable[name] = true;
             }
             await guildData.updateAntiraid(guildData.antiraid)
-            await message.channel.send(lang.antiraidConfig.allOn)
+            await message.reply(lang.antiraidConfig.allOn)
 
 
         }
@@ -39,7 +51,7 @@ module.exports = class Test extends Command {
                 enable[name] = false;
             }
             await guildData.updateAntiraid(guildData.antiraid)
-            await message.channel.send(lang.antiraidConfig.allOff)
+            await message.reply(lang.antiraidConfig.allOff)
         }
         if (args[0] === "opti") {
             const {enable, config, bypass} = guildData.antiraid
@@ -106,10 +118,10 @@ module.exports = class Test extends Command {
             bypass["vanityUpdate"] = false
 
             await guildData.updateAntiraid(guildData.antiraid)
-            message.channel.send(lang.antiraidConfig.opti)
+            message.reply(lang.antiraidConfig.opti)
         }
         if (args[0] === "config") {
-            const msg = await message.channel.send(lang.loading)
+            const msg = await message.reply(lang.loading)
             const emojis = ['◀', '1️⃣', "2️⃣", '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '▶', '❌']
             for await(const em of emojis) {
                 await msg.react(em)
@@ -267,25 +279,25 @@ module.exports = class Test extends Command {
                     }
                     if (Object.keys(emojiQuestion).includes(r.emoji.name)) {
                         const {question, type} = emojiQuestion[r.emoji.name];
-                        await message.channel.send(question).then(mp => {
+                        await message.reply(question).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(cld => {
                                     let msg = cld.first();
                                     if (type === 'limit') {
                                         if (eventName === "antiDc") {
                                             if (isNaN(msg.content.split('')[0]) || !msg.content.endsWith('s') || !msg.content.endsWith('m') || !msg.content.endsWith('h') || !msg.content.endsWith('d') || !msg.content.endsWith('w') || !msg.content.endsWith('y')) {
-                                                return message.channel.send(lang.antiraidConfig.antiDcError)
+                                                return message.reply(lang.antiraidConfig.antiDcError)
                                             }
                                         } else {
                                             if (isNaN(!msg.content)) {
-                                                return message.channel.send(lang.antiraidConfig.limitError)
+                                                return message.reply(lang.antiraidConfig.limitError)
                                             }
                                         }
                                         config[`${eventName}Limit`] = msg.content;
 
                                     } else {
                                         if (eventName === 'antiDc' && msg.content === 'unrank') {
-                                            return message.channel.send(lang.antiraidConfig.antiDcUnrank)
+                                            return message.reply(lang.antiraidConfig.antiDcUnrank)
                                         }
                                         config[eventName] = msg.content;
 
@@ -335,14 +347,14 @@ module.exports = class Test extends Command {
 
             }
             const saveFilter = (reaction, user) => ['✅'].includes(reaction.emoji.name) && user.id === message.author.id;
-            const confirMsg = await message.channel.send(lang.antiraidConfig.reactsave)
+            const confirMsg = await message.reply(lang.antiraidConfig.reactsave)
             await confirMsg.react('✅')
             const saveCollector = confirMsg.createReactionCollector({ filter: saveFilter, time: 900000});
             saveCollector.on('collect', async r => {
                 await r.users.remove(message.author);
                 if (r.emoji.name === '✅') {
                     await guildData.updateAntiraid(antiraidConfig)
-                    const replyMsg = message.channel.send(lang.antiraidConfig.savedmsg);
+                    const replyMsg = message.reply(lang.antiraidConfig.savedmsg);
                     setTimeout(async () => {
                         await saveCollector.stop();
 
@@ -391,7 +403,7 @@ module.exports = class Test extends Command {
                 await msg.reactions.removeAll()
                 await msg.delete()
                 if (reason === "time") {
-                    const timeoutmsg = await message.channel.send(lang.antiraidConfig.timeoutmsg);
+                    const timeoutmsg = await message.reply(lang.antiraidConfig.timeoutmsg);
                     setTimeout(async () => {
                         timeoutmsg.delete()
                     }, 5000)

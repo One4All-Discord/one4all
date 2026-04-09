@@ -1,10 +1,12 @@
 const { EmbedBuilder } = require('discord.js');
 
 const Colors = {
-    DEFAULT: '#8B5CF6',
-    SUCCESS: '#10B981',
-    ERROR: '#EF4444',
-    WARNING: '#F59E0B',
+    DEFAULT: '#2ECC71',
+    SUCCESS: '#2ECC71',
+    ERROR: '#E74C3C',
+    WARNING: '#F39C12',
+    INFO: '#3498DB',
+    MUTE: '#95A5A6',
 };
 
 class Embed extends EmbedBuilder {
@@ -17,7 +19,6 @@ class Embed extends EmbedBuilder {
         this.setColor(guildData?.color || Colors.DEFAULT);
         this.setTimestamp();
         if (client?.user) {
-            this.setAuthor({ name: client.user.username, iconURL: client.user.displayAvatarURL() });
             this.setFooter({ text: client.user.username, iconURL: client.user.displayAvatarURL() });
         }
     }
@@ -34,6 +35,11 @@ class Embed extends EmbedBuilder {
 
     setWarning() {
         this.setColor(Colors.WARNING);
+        return this;
+    }
+
+    setInfo() {
+        this.setColor(Colors.INFO);
         return this;
     }
 

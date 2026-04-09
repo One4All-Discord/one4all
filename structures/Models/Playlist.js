@@ -9,7 +9,7 @@ module.exports = (Sequelize, oneforall) => {
             playlist: {
                 type: Sequelize.TEXT('long'),
                 allowNull: true,
-                defaultValue: '[]',
+                defaultValue: null,
                 get: function () {
                     const raw = this.getDataValue('playlist');
                     try {

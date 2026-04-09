@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
 const coinSettings = new Map();
 const Command = require('../../structures/Handler/Command');
@@ -25,7 +26,7 @@ module.exports = class Test extends Command {
 
 
         const color = guildData.color
-        const principalMsg = await message.channel.send(lang.loading)
+        const principalMsg = await message.reply(lang.loading)
         const emoji = ['🎥', '😶', '💌', '❌', '🌀', '✅']
         for (const em of emoji) {
             await principalMsg.react(em)
@@ -40,23 +41,21 @@ module.exports = class Test extends Command {
             muteDiviseur: guildData.config.muteDiviseur,
             logs: guildData.config.coinsLogs
         }
-        const embed = new EmbedBuilder()
+        const embed = new Embed(client, guildData)
             .setTitle(lang.coinSettings.title)
             .setDescription(lang.coinSettings.description(config.streamBoost, config.muteDiviseur, config.logs, config.enable === false ? 'Désactiver' : 'Activer'))
-            .setColor(`${color}`)
             .setFooter({ text: client.user.username })
-            .setTimestamp()
         principalMsg.edit({ embeds: [embed] }).then(async m => {
             const collector = m.createReactionCollector({ filter: filter, time: 900000});
             collector.on('collect', async r => {
                 await r.users.remove(message.author);
                 if (r.emoji.name === emoji[0]) {
-                    message.channel.send(lang.coinSettings.streamBoostQ).then(mp => {
+                    message.reply(lang.coinSettings.streamBoostQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
-                                if (msg.content === "cancel") return message.channel.send(lang.cancel).then(mps => setTimeout(() => mps.delete().catch(() => {}), 4000))
-                                if (isNaN(msg.content)) return message.channel.send(lang.coinSettings.onlyNumber).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+                                if (msg.content === "cancel") return message.reply(lang.cancel).then(mps => setTimeout(() => mps.delete().catch(() => {}), 4000))
+                                if (isNaN(msg.content)) return message.reply(lang.coinSettings.onlyNumber).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
                                 config.streamBoost = msg.content
                                 await msg.delete()
                                 mp.delete()
@@ -64,12 +63,12 @@ module.exports = class Test extends Command {
                             })
                     })
                 } else if (r.emoji.name === emoji[1]) {
-                    message.channel.send(lang.coinSettings.muteDiviseurQ).then(mp => {
+                    message.reply(lang.coinSettings.muteDiviseurQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
-                                if (msg.content === "cancel") return message.channel.send(lang.cancel).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-                                if (isNaN(msg.content)) return message.channel.send(lang.coinSettings.onlyNumber).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+                                if (msg.content === "cancel") return message.reply(lang.cancel).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+                                if (isNaN(msg.content)) return message.reply(lang.coinSettings.onlyNumber).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
                                 config.muteDiviseur = msg.content
                                 await msg.delete()
                                 mp.delete()
@@ -78,15 +77,15 @@ module.exports = class Test extends Command {
                     })
 
                 } else if (r.emoji.name === emoji[2]) {
-                    message.channel.send(lang.coinSettings.logsQ).then(mp => {
+                    message.reply(lang.coinSettings.logsQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
 
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content != 'cancel') {
-                                    return message.channel.send(lang.coinSettings.errorNotChannel)
+                                    return message.reply(lang.coinSettings.errorNotChannel)
                                 }
-                                if (msg.content === "cancel") return message.channel.send(lang.cancel).then(mps => setTimeout(() => mps.delete().catch(() => {}), 4000))
+                                if (msg.content === "cancel") return message.reply(lang.cancel).then(mps => setTimeout(() => mps.delete().catch(() => {}), 4000))
                                 let ch;
                                 if (!isNaN(msg.content)) {
                                     try {
@@ -97,7 +96,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first()) ch = msg.mentions.channels.first();
 
-                                if (ch.type !== ChannelType.GuildText) await message.channel.send(lang.coinSettings.errorNotChannel).then((e) => {
+                                if (ch.type !== ChannelType.GuildText) await message.reply(lang.coinSettings.errorNotChannel).then((e) => {
                                     return setTimeout(() => {
                                         e.delete()
                                     }, 2000);
@@ -111,7 +110,7 @@ module.exports = class Test extends Command {
                             })
                     })
                 } else if (r.emoji.name === emoji[3]) {
-                    message.channel.send(lang.coinSettings.cancel).then((mp) => {
+                    message.reply(lang.coinSettings.cancel).then((mp) => {
 
                         collector.stop();
                         setTimeout(async () => {
@@ -128,7 +127,7 @@ module.exports = class Test extends Command {
 
                     guildData.updateShopSettings(config.streamBoost, config.muteDiviseur, config.logs, config.enable === true).then(() => {
                         coinSettings.set(message.guild.id, config)
-                        message.channel.send(lang.coinSettings.save).then(mp => {
+                        message.reply(lang.coinSettings.save).then(mp => {
                             setTimeout(() => {
                                 mp.delete()
                                 principalMsg.delete()

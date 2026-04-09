@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
 const Command = require('../../structures/Handler/Command');
 module.exports = class Test extends Command {
@@ -29,7 +30,7 @@ module.exports = class Test extends Command {
         let boosterCount = new Map();
         const color = guildData.color;
         const lang = client.lang(guildData.lang)
-        const msg = await message.channel.send(lang.loading)
+        const msg = await message.reply(lang.loading)
         const emoji = ['👥', '🤖', '🔊', '🟢', '⭕', '📖', '✨', '💠', '❌', '✅']
         for (const em of emoji) {
             await msg.react(em)
@@ -47,26 +48,24 @@ module.exports = class Test extends Command {
             dureefiltrer = response => {
                 return response.author.id === message.author.id
             };
-        const embed = new EmbedBuilder()
+        const embed = new Embed(client, guildData)
             .setTitle(lang.counter.embedTitle)
             .setDescription(lang.counter.embedDescription(memberCount.get(message.guild.id).name, botCount.get(message.guild.id).name, voiceCount.get(message.guild.id).name, onlineCount.get(message.guild.id).name, offlineCount.get(message.guild.id).name, channelCount.get(message.guild.id).name, roleCount.get(message.guild.id).name, boosterCount.get(message.guild.id).name))
-            .setTimestamp()
-            .setColor(color)
             .setFooter({ text: client.user.username })
         msg.edit({ embeds: [embed] }).then(async m => {
             const collector = m.createReactionCollector({ filter: filter, time: 900000});
             collector.on('collect', async r => {
                 await r.users.remove(message.author);
                 if (r.emoji.name === emoji[0]) {
-                    message.channel.send(lang.counter.memberChQ).then(mp => {
+                    message.reply(lang.counter.memberChQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                    return message.channel.send(lang.counter.errorNotChannel)
+                                    return message.reply(lang.counter.errorNotChannel)
                                 }
                                 if (msg.content === 'off') {
-                                    await message.channel.send(lang.counter.disable("de membre")).then((e) => {
+                                    await message.reply(lang.counter.disable("de membre")).then((e) => {
                                         memberCount.set(message.guild.id, {
                                             id: undefined,
                                             name: `Non définie`
@@ -88,7 +87,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                 if (msg.content !== "off") {
-                                    if (ch.type !== ChannelType.GuildVoice) await message.channel.send(lang.counter.notVoice).then((e) => {
+                                    if (ch.type !== ChannelType.GuildVoice) await message.reply(lang.counter.notVoice).then((e) => {
                                         return setTimeout(() => {
                                             e.delete()
                                         }, 2000);
@@ -96,7 +95,7 @@ module.exports = class Test extends Command {
                                 }
                                 if (msg.content !== "off" && ch.type === ChannelType.GuildVoice) {
 
-                                    const replyMsg = message.channel.send(lang.counter.successMemberCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.counter.successMemberCh(ch)).then((replyMSG) => {
                                         setTimeout(async () => {
                                             await replyMSG.delete();
                                             await mp.delete();
@@ -109,7 +108,7 @@ module.exports = class Test extends Command {
                                     //     name:
                                     // }
 
-                                    message.channel.send(lang.counter.nameQ).then((messageReply) => {
+                                    message.reply(lang.counter.nameQ).then((messageReply) => {
                                         messageReply.channel.awaitMessages({ filter: dureefiltrer, 
                                             max: 1,
                                             time: 30000
@@ -120,7 +119,7 @@ module.exports = class Test extends Command {
                                                     id: ch.id,
                                                     name: `${msg.content}`
                                                 })
-                                                const replayMsg = message.channel.send(lang.counter.successMemberName(msg.content)).then(rp => {
+                                                const replayMsg = message.reply(lang.counter.successMemberName(msg.content)).then(rp => {
                                                     setTimeout(async () => {
                                                         await rp.delete();
                                                         await messageReply.delete();
@@ -137,15 +136,15 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[1]) {
-                    message.channel.send(lang.counter.botChQ).then(mp => {
+                    message.reply(lang.counter.botChQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                    return message.channel.send(lang.counter.errorNotChannel)
+                                    return message.reply(lang.counter.errorNotChannel)
                                 }
                                 if (msg.content === 'off') {
-                                    await message.channel.send(lang.counter.disable("de bots")).then((e) => {
+                                    await message.reply(lang.counter.disable("de bots")).then((e) => {
                                         botCount.set(message.guild.id, {
                                             id: undefined,
                                             name: `Non définie`
@@ -167,7 +166,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                 if (msg.content !== "off") {
-                                    if (ch.type !== ChannelType.GuildVoice) await message.channel.send(lang.counter.notVoice).then((e) => {
+                                    if (ch.type !== ChannelType.GuildVoice) await message.reply(lang.counter.notVoice).then((e) => {
                                         return setTimeout(() => {
                                             e.delete()
                                         }, 2000);
@@ -175,7 +174,7 @@ module.exports = class Test extends Command {
                                 }
                                 if (msg.content !== "off" && ch.type === ChannelType.GuildVoice) {
 
-                                    const replyMsg = message.channel.send(lang.counter.successBotCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.counter.successBotCh(ch)).then((replyMSG) => {
                                         setTimeout(async () => {
                                             await replyMSG.delete();
                                             await mp.delete();
@@ -183,7 +182,7 @@ module.exports = class Test extends Command {
                                         }, 2000)
 
                                     })
-                                    message.channel.send(lang.counter.nameQ).then((messageReply) => {
+                                    message.reply(lang.counter.nameQ).then((messageReply) => {
                                         messageReply.channel.awaitMessages({ filter: dureefiltrer, 
                                             max: 1,
                                             time: 30000
@@ -194,7 +193,7 @@ module.exports = class Test extends Command {
                                                     id: ch.id,
                                                     name: `${msg.content}`
                                                 })
-                                                const replayMsg = message.channel.send(lang.counter.successBotName(msg.content)).then(rp => {
+                                                const replayMsg = message.reply(lang.counter.successBotName(msg.content)).then(rp => {
                                                     setTimeout(async () => {
                                                         await rp.delete();
                                                         await messageReply.delete();
@@ -212,15 +211,15 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[2]) {
-                    message.channel.send(lang.counter.vocalChQ).then(mp => {
+                    message.reply(lang.counter.vocalChQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                    return message.channel.send(lang.counter.errorNotChannel)
+                                    return message.reply(lang.counter.errorNotChannel)
                                 }
                                 if (msg.content === 'off') {
-                                    await message.channel.send(lang.counter.disable("de membre en vocal")).then((e) => {
+                                    await message.reply(lang.counter.disable("de membre en vocal")).then((e) => {
                                         voiceCount.set(message.guild.id, {
                                             id: undefined,
                                             name: `Non définie`
@@ -242,7 +241,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                 if (msg.content !== "off") {
-                                    if (ch.type !== ChannelType.GuildVoice) await message.channel.send(lang.counter.notVoice).then((e) => {
+                                    if (ch.type !== ChannelType.GuildVoice) await message.reply(lang.counter.notVoice).then((e) => {
                                         return setTimeout(() => {
                                             e.delete()
                                         }, 2000);
@@ -250,7 +249,7 @@ module.exports = class Test extends Command {
                                 }
                                 if (msg.content !== "off" && ch.type === ChannelType.GuildVoice) {
 
-                                    const replyMsg = message.channel.send(lang.counter.successVocalCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.counter.successVocalCh(ch)).then((replyMSG) => {
                                         setTimeout(async () => {
                                             await replyMSG.delete();
                                             await mp.delete();
@@ -258,7 +257,7 @@ module.exports = class Test extends Command {
                                         }, 2000)
 
                                     })
-                                    message.channel.send(lang.counter.nameQ).then((messageReply) => {
+                                    message.reply(lang.counter.nameQ).then((messageReply) => {
                                         messageReply.channel.awaitMessages({ filter: dureefiltrer, 
                                             max: 1,
                                             time: 30000
@@ -269,7 +268,7 @@ module.exports = class Test extends Command {
                                                     id: ch.id,
                                                     name: `${msg.content}`
                                                 })
-                                                const replayMsg = message.channel.send(lang.counter.successVocalName(msg.content)).then(rp => {
+                                                const replayMsg = message.reply(lang.counter.successVocalName(msg.content)).then(rp => {
                                                     setTimeout(async () => {
                                                         await rp.delete();
                                                         await messageReply.delete();
@@ -286,15 +285,15 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[3]) {
-                    message.channel.send(lang.counter.onlineChQ).then(mp => {
+                    message.reply(lang.counter.onlineChQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                    return message.channel.send(lang.counter.errorNotChannel)
+                                    return message.reply(lang.counter.errorNotChannel)
                                 }
                                 if (msg.content === 'off') {
-                                    await message.channel.send(lang.counter.disable("de membre en ligne")).then((e) => {
+                                    await message.reply(lang.counter.disable("de membre en ligne")).then((e) => {
                                         onlineCount.set(message.guild.id,{
                                             id: undefined,
                                             name: `Non définie`
@@ -316,7 +315,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                 if (msg.content !== "off") {
-                                    if (ch.type !== ChannelType.GuildVoice) await message.channel.send(lang.counter.notVoice).then((e) => {
+                                    if (ch.type !== ChannelType.GuildVoice) await message.reply(lang.counter.notVoice).then((e) => {
                                         return setTimeout(() => {
                                             e.delete()
                                         }, 2000);
@@ -324,7 +323,7 @@ module.exports = class Test extends Command {
                                 }
                                 if (msg.content !== "off" && ch.type === ChannelType.GuildVoice) {
 
-                                    const replyMsg = message.channel.send(lang.counter.successOnlineCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.counter.successOnlineCh(ch)).then((replyMSG) => {
                                         setTimeout(async () => {
                                             await replyMSG.delete();
                                             await mp.delete();
@@ -332,7 +331,7 @@ module.exports = class Test extends Command {
                                         }, 2000)
 
                                     })
-                                    message.channel.send(lang.counter.nameQ).then((messageReply) => {
+                                    message.reply(lang.counter.nameQ).then((messageReply) => {
                                         messageReply.channel.awaitMessages({ filter: dureefiltrer, 
                                             max: 1,
                                             time: 30000
@@ -343,7 +342,7 @@ module.exports = class Test extends Command {
                                                     id: ch.id,
                                                     name: `${msg.content}`
                                                 })
-                                                const replayMsg = message.channel.send(lang.counter.successOnlineName(msg.content)).then(rp => {
+                                                const replayMsg = message.reply(lang.counter.successOnlineName(msg.content)).then(rp => {
                                                     setTimeout(async () => {
                                                         await rp.delete();
                                                         await messageReply.delete();
@@ -360,15 +359,15 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[4]) {
-                    message.channel.send(lang.counter.offlineChQ).then(mp => {
+                    message.reply(lang.counter.offlineChQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                    return message.channel.send(lang.counter.errorNotChannel)
+                                    return message.reply(lang.counter.errorNotChannel)
                                 }
                                 if (msg.content === 'off') {
-                                    await message.channel.send(lang.counter.disable("de membre hors-ligne")).then((e) => {
+                                    await message.reply(lang.counter.disable("de membre hors-ligne")).then((e) => {
                                         offlineCount.set(message.guild.id,{
                                             id: undefined,
                                             name: `Non définie`
@@ -390,7 +389,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                 if (msg.content !== "off") {
-                                    if (ch.type !== ChannelType.GuildVoice) await message.channel.send(lang.counter.notVoice).then((e) => {
+                                    if (ch.type !== ChannelType.GuildVoice) await message.reply(lang.counter.notVoice).then((e) => {
                                         return setTimeout(() => {
                                             e.delete()
                                         }, 2000);
@@ -398,7 +397,7 @@ module.exports = class Test extends Command {
                                 }
                                 if (msg.content !== "off" && ch.type === ChannelType.GuildVoice) {
 
-                                    const replyMsg = message.channel.send(lang.counter.successOfflineCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.counter.successOfflineCh(ch)).then((replyMSG) => {
                                         setTimeout(async () => {
                                             await replyMSG.delete();
                                             await mp.delete();
@@ -406,7 +405,7 @@ module.exports = class Test extends Command {
                                         }, 2000)
 
                                     })
-                                    message.channel.send(lang.counter.nameQ).then((messageReply) => {
+                                    message.reply(lang.counter.nameQ).then((messageReply) => {
                                         messageReply.channel.awaitMessages({ filter: dureefiltrer, 
                                             max: 1,
                                             time: 30000
@@ -417,7 +416,7 @@ module.exports = class Test extends Command {
                                                     id: ch.id,
                                                     name: `${msg.content}`
                                                 })
-                                                const replayMsg = message.channel.send(lang.counter.successOfflineName(msg.content)).then(rp => {
+                                                const replayMsg = message.reply(lang.counter.successOfflineName(msg.content)).then(rp => {
                                                     setTimeout(async () => {
                                                         await rp.delete();
                                                         await messageReply.delete();
@@ -434,15 +433,15 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[5]) {
-                    message.channel.send(lang.counter.channelChQ).then(mp => {
+                    message.reply(lang.counter.channelChQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                    return message.channel.send(lang.counter.errorNotChannel)
+                                    return message.reply(lang.counter.errorNotChannel)
                                 }
                                 if (msg.content === 'off') {
-                                    await message.channel.send(lang.counter.disable("de salons")).then((e) => {
+                                    await message.reply(lang.counter.disable("de salons")).then((e) => {
                                         channelCount.set(message.guild.id, {
                                             id: undefined,
                                             name: `Non définie`
@@ -464,7 +463,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                 if (msg.content !== "off") {
-                                    if (ch.type !== ChannelType.GuildVoice) await message.channel.send(lang.counter.notVoice).then((e) => {
+                                    if (ch.type !== ChannelType.GuildVoice) await message.reply(lang.counter.notVoice).then((e) => {
                                         return setTimeout(() => {
                                             e.delete()
                                         }, 2000);
@@ -473,7 +472,7 @@ module.exports = class Test extends Command {
 
                                 if (msg.content !== "off" && ch.type === ChannelType.GuildVoice) {
 
-                                    const replyMsg = message.channel.send(lang.counter.successChannelCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.counter.successChannelCh(ch)).then((replyMSG) => {
                                         setTimeout(async () => {
                                             await replyMSG.delete();
                                             await mp.delete();
@@ -481,7 +480,7 @@ module.exports = class Test extends Command {
                                         }, 2000)
 
                                     })
-                                    message.channel.send(lang.counter.nameQ).then((messageReply) => {
+                                    message.reply(lang.counter.nameQ).then((messageReply) => {
                                         messageReply.channel.awaitMessages({ filter: dureefiltrer, 
                                             max: 1,
                                             time: 30000
@@ -492,7 +491,7 @@ module.exports = class Test extends Command {
                                                     id: ch.id,
                                                     name: `${msg.content}`
                                                 })
-                                                const replayMsg = message.channel.send(lang.counter.successChannelName(msg.content)).then(rp => {
+                                                const replayMsg = message.reply(lang.counter.successChannelName(msg.content)).then(rp => {
                                                     setTimeout(async () => {
                                                         await rp.delete();
                                                         await messageReply.delete();
@@ -510,15 +509,15 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[6]) {
-                    message.channel.send(lang.counter.roleChQ).then(mp => {
+                    message.reply(lang.counter.roleChQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                    return message.channel.send(lang.counter.errorNotChannel)
+                                    return message.reply(lang.counter.errorNotChannel)
                                 }
                                 if (msg.content === 'off') {
-                                    await message.channel.send(lang.counter.disable("de rôles")).then((e) => {
+                                    await message.reply(lang.counter.disable("de rôles")).then((e) => {
                                         roleCount.set(message.guild.id, {
                                             id: undefined,
                                             name: `Non définie`
@@ -540,7 +539,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                 if (msg.content !== "off") {
-                                    if (ch.type !== ChannelType.GuildVoice) await message.channel.send(lang.counter.notVoice).then((e) => {
+                                    if (ch.type !== ChannelType.GuildVoice) await message.reply(lang.counter.notVoice).then((e) => {
                                         return setTimeout(() => {
                                             e.delete()
                                         }, 2000);
@@ -548,7 +547,7 @@ module.exports = class Test extends Command {
                                 }
                                 if (msg.content !== "off" && ch.type === ChannelType.GuildVoice) {
 
-                                    const replyMsg = message.channel.send(lang.counter.successRoleCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.counter.successRoleCh(ch)).then((replyMSG) => {
                                         setTimeout(async () => {
                                             await replyMSG.delete();
                                             await mp.delete();
@@ -556,7 +555,7 @@ module.exports = class Test extends Command {
                                         }, 2000)
 
                                     })
-                                    message.channel.send(lang.counter.nameQ).then((messageReply) => {
+                                    message.reply(lang.counter.nameQ).then((messageReply) => {
                                         messageReply.channel.awaitMessages({ filter: dureefiltrer, 
                                             max: 1,
                                             time: 30000
@@ -567,7 +566,7 @@ module.exports = class Test extends Command {
                                                     id: ch.id,
                                                     name: `${msg.content}`
                                                 })
-                                                const replayMsg = message.channel.send(lang.counter.successRoleName(msg.content)).then(rp => {
+                                                const replayMsg = message.reply(lang.counter.successRoleName(msg.content)).then(rp => {
                                                     setTimeout(async () => {
                                                         await rp.delete();
                                                         await messageReply.delete();
@@ -584,15 +583,15 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[7]) {
-                    message.channel.send(lang.counter.boostChQ).then(mp => {
+                    message.reply(lang.counter.boostChQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                    return message.channel.send(lang.counter.errorNotChannel)
+                                    return message.reply(lang.counter.errorNotChannel)
                                 }
                                 if (msg.content === 'off') {
-                                    await message.channel.send(lang.counter.disable("de booster")).then((e) => {
+                                    await message.reply(lang.counter.disable("de booster")).then((e) => {
                                         boosterCount.set(message.guild.id, {
                                             id: undefined,
                                             name: `Non définie`
@@ -614,7 +613,7 @@ module.exports = class Test extends Command {
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                 if (msg.content !== "off") {
-                                    if (ch.type !== ChannelType.GuildVoice) await message.channel.send(lang.counter.notVoice).then((e) => {
+                                    if (ch.type !== ChannelType.GuildVoice) await message.reply(lang.counter.notVoice).then((e) => {
                                         return setTimeout(() => {
                                             e.delete()
                                         }, 2000);
@@ -622,7 +621,7 @@ module.exports = class Test extends Command {
                                 }
                                 if (msg.content !== "off" && ch.type === ChannelType.GuildVoice) {
 
-                                    const replyMsg = message.channel.send(lang.counter.successBoostCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.counter.successBoostCh(ch)).then((replyMSG) => {
                                         setTimeout(async () => {
                                             await replyMSG.delete();
                                             await mp.delete();
@@ -630,7 +629,7 @@ module.exports = class Test extends Command {
                                         }, 2000)
 
                                     })
-                                    message.channel.send(lang.counter.nameQ).then((messageReply) => {
+                                    message.reply(lang.counter.nameQ).then((messageReply) => {
                                         messageReply.channel.awaitMessages({ filter: dureefiltrer, 
                                             max: 1,
                                             time: 30000
@@ -641,7 +640,7 @@ module.exports = class Test extends Command {
                                                     id: ch.id,
                                                     name: `${msg.content}`
                                                 })
-                                                const replayMsg = message.channel.send(lang.counter.successBoostName(msg.content)).then(rp => {
+                                                const replayMsg = message.reply(lang.counter.successBoostName(msg.content)).then(rp => {
                                                     setTimeout(async () => {
                                                         await rp.delete();
                                                         await messageReply.delete();
@@ -659,7 +658,7 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[8]) {
-                    message.channel.send(lang.setlogs.cancel).then((mp) => {
+                    message.reply(lang.setlogs.cancel).then((mp) => {
                         memberCount.delete(message.guild.id);
                         botCount.delete(message.guild.id);
                         onlineCount.delete(message.guild.id);
@@ -676,7 +675,7 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emoji[9]) {
-                    message.channel.send(lang.setlogs.save).then(async (mp) => {
+                    message.reply(lang.setlogs.save).then(async (mp) => {
 
                         await guildData.updateCounter(memberCount.get(message.guild.id), botCount.get(message.guild.id), voiceCount.get(message.guild.id), onlineCount.get(message.guild.id), offlineCount.get(message.guild.id), channelCount.get(message.guild.id), roleCount.get(message.guild.id), boosterCount.get(message.guild.id))
 

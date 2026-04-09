@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const Command = require('../../structures/Handler/Command');
 module.exports = class Test extends Command{
@@ -23,12 +24,11 @@ module.exports = class Test extends Command{
     let member = message.mentions.users.first() || message.author
 
     let rng = Math.floor(Math.random() * 100)
-    const gaydetectorembed = new EmbedBuilder()
+    const gaydetectorembed = new Embed(client, guildData)
     .setTitle(lang.gaydetector.title)
     .setDescription(`**${member.username}** est gay à ${rng}% 🏳️‍🌈`)
-    .setColor(`${color}`)
 
-    message.channel.send({ embeds: [gaydetectorembed] })
+    message.reply({ embeds: [gaydetectorembed] })
 
     }
 };

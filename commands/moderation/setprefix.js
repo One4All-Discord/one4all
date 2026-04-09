@@ -25,19 +25,19 @@ module.exports = class Test extends Command {
 
         let regex = /^[ !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{1}$/igm;
         let isValid = regex.test(args[0]);
-        if (!isValid) return message.channel.send(lang.setprefix.errorNoValid)
+        if (!isValid) return message.reply(lang.setprefix.errorNoValid)
 
         const [cmdName, newPrefix] = message.content.split(" ");
         if (newPrefix) {
             try {
                 guildData.updatePrefix = newPrefix
-                message.channel.send(lang.setprefix.success(newPrefix));
+                message.reply(lang.setprefix.success(newPrefix));
             } catch (err) {
                 console.log(err);
-                message.channel.send(lang.setprefix.errorSql(newPrefix));
+                message.reply(lang.setprefix.errorSql(newPrefix));
             }
         } else {
-            message.channel.send(lang.setprefix.errorNoArgs);
+            message.reply(lang.setprefix.errorNoArgs);
         }
     }
 }

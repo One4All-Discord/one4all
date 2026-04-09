@@ -47,7 +47,7 @@ module.exports = class webhookUpdate extends Event {
 
                 if(newChannel){
                     const embed = new EmbedBuilder()
-                        .setDescription('Une creation de webhook a ete detecte le channel a donc ete renew [oneforall antiraid](https://discord.gg/rdrTpVeGWX)')
+                        .setDescription('Une creation de webhook a ete detecte le channel a donc ete renew [oneforall antiraid](https://discord.gg/TfwGcCjyfp)')
                         .setColor(color)
                         .setTimestamp()
                         .setFooter({ text: client.user.username })

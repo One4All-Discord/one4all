@@ -21,7 +21,7 @@ module.exports = class Shuffle extends Command {
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours de lecture.');
         }
 
         queue.tracks.shuffle();
@@ -29,6 +29,6 @@ module.exports = class Shuffle extends Command {
         const embed = new Embed(client, guildData)
             .setDescription("La file d'attente a été mélangée.");
 
-        message.channel.send({ embeds: [embed] });
+        message.reply({ embeds: [embed] });
     }
 };

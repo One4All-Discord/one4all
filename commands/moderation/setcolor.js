@@ -1,61 +1,41 @@
-
 const Command = require('../../structures/Handler/Command');
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const Embed = require('../../structures/Embed');
+const { PermissionFlagsBits } = require('discord.js');
 let hexColorRegex = require('hex-color-regex');
-module.exports = class Test extends Command{
+
+module.exports = class SetColor extends Command {
     constructor() {
         super({
             name: 'setcolor',
-            description: 'Change all embeds color of the bot in your server | Changer la couleur des embeds dans votre serveur',
-            usage: 'setcolor <HTML COLOR>',
+            description: 'Changer la couleur des embeds',
+            usage: 'setcolor <#hex>',
             category: 'moderation',
             clientPermissions: [PermissionFlagsBits.SendMessages],
-            guildOwnerOnly : true,
+            guildOwnerOnly: true,
             cooldown: 5
-
         });
     }
-    async run(client, message,args){
 
-    const guildData = client.getGuildData(message.guild.id);
-    const lang = client.lang(guildData.lang)
+    async run(client, message, args) {
+        const guildData = client.getGuildData(message.guild.id);
+        const lang = client.lang(guildData.lang);
 
+        const color = args[0];
+        if (!color) return message.reply(lang.setcolor.noColor);
+        if (!hexColorRegex().test(color)) return message.reply(lang.setcolor.errorNoArgs);
 
-    const color = args[0];
-    let checkColor = hexColorCheck(color);
+        try {
+            guildData.updateColor = color;
+            guildData.color = color;
 
-    if (!color) return message.channel.send(lang.setcolor.noColor)
-    if (color) {
-        if (checkColor) {
-            try {
-                guildData.updateColor = color;
-                message.channel.send(lang.setcolor.success(color));
-                const exampleEmbed = new EmbedBuilder()
-                    .setColor(`${color}`)
-                    .setDescription(lang.setcolor.successDescription)
-                    .setTitle(lang.setcolor.titleDescription)
-                message.channel.send({ embeds: [exampleEmbed] });
-
-               guildData.color = color;
-            } catch (err) {
-                console.log(err);
-                message.channel.send(lang.setcolor.errorSql(color))
-            }
-
-        } else {
-            message.channel.send(lang.setcolor.errorNoArgs)
+            const embed = new Embed(client, guildData)
+                .setColor(color)
+                .setAuthor({ name: 'Couleur mise à jour', iconURL: client.user.displayAvatarURL() })
+                .setDescription(`Nouvelle couleur : \`${color}\``);
+            message.reply({ embeds: [embed] });
+        } catch (err) {
+            console.log(err);
+            message.reply(lang.setcolor.errorSql(color));
         }
     }
-
-
-}};
-
-
-function hexColorCheck(a) {
-    let check = hexColorRegex().test(a);
-    let checkVerify = false;
-    if (check === true) {
-        checkVerify = true;
-    }
-    return checkVerify;
-}
+};

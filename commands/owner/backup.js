@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const guildEmbedColor = new Map();
 const backup = require('discord-backup')
@@ -29,14 +30,11 @@ module.exports = class Test extends Command {
         const show = args[0] === 'info';
         const del = args[0] === 'delete'
         if (!args[0]) {
-            const helpEmbed = new EmbedBuilder()
-                .setAuthor({ name: `Informations Backup`, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-                .setColor(`${color}`)
-                .setTimestamp()
-                .setThumbnail(`https://images-ext-1.discordapp.net/external/io8pRqFGLz1MelORzIv2tAiPB3uulaHCX_QH7XEK0y4/%3Fwidth%3D588%26height%3D588/https/media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg`)
-                .setFooter({ text: "Informations Backup", iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-                .addFields({ name: '🏠 Backup:', value: `[\`backup create\`](https://discord.gg/h69YZHB7Nh) ・ Permet de créer une backup du serveur actuel\n[\`backup delete\`](https://discord.gg/h69YZHB7Nh) ・ Permet de supprimer une backup\n[\`backup info\`](https://discord.gg/h69YZHB7Nh) ・ Permet d'afficher des informations sur la backup\n[\`backup list\`](https://discord.gg/h69YZHB7Nh) ・ Permet d'afficher la liste des toutes les backup` })
-            message.channel.send({ embeds: [helpEmbed] })
+            const helpEmbed = new Embed(client, guildData)
+                .setAuthor({ name: `Informations Backup`, iconURL: client.user.displayAvatarURL() })
+                .setFooter({ text: "Informations Backup", iconURL: client.user.displayAvatarURL() })
+                .addFields({ name: '🏠 Backup:', value: `[\`backup create\`](https://discord.gg/TfwGcCjyfp) ・ Permet de créer une backup du serveur actuel\n[\`backup delete\`](https://discord.gg/TfwGcCjyfp) ・ Permet de supprimer une backup\n[\`backup info\`](https://discord.gg/TfwGcCjyfp) ・ Permet d'afficher des informations sur la backup\n[\`backup list\`](https://discord.gg/TfwGcCjyfp) ・ Permet d'afficher la liste des toutes les backup` })
+            message.reply({ embeds: [helpEmbed] })
         }
         if (create) {
         
@@ -44,7 +42,7 @@ module.exports = class Test extends Command {
                 dureefiltrer = response => {
                     return response.author.id === message.author.id
                 };
-            msg = await message.channel.send(lang.loading)
+            msg = await message.reply(lang.loading)
             await msg.react('1️⃣')
             await msg.react('2️⃣')
             await msg.react('3️⃣')
@@ -55,11 +53,9 @@ module.exports = class Test extends Command {
             let ignoreRl = false;
             let ignoreEmo = false;
             let ignoreBans = false;
-            configEmbed = new EmbedBuilder()
+            configEmbed = new Embed(client, guildData)
                 .setTitle(lang.backup.configEmbedT)
                 .setDescription(lang.backup.configEmbedDesc(ignoreCh, ignoreRl, ignoreEmo, ignoreBans))
-                .setColor(`${color}`)
-                .setTimestamp()
                 .setFooter({ text: client.user.username });
 
             msg.edit({ content: '\u200b', embeds: [configEmbed] }).then(async m => {
@@ -147,9 +143,9 @@ module.exports = class Test extends Command {
                         await collector.stop();
                         await msg.delete();
                         doNotBackup.delete(message.author.id)
-                        return message.channel.send(lang.backup.cancel)
+                        return message.reply(lang.backup.cancel)
                     } else if (r.emoji.name === '✅') {
-                        const doing = await message.channel.send(lang.loading)
+                        const doing = await message.reply(lang.loading)
                         const guildName = new Map();
                         if (message.guild.name.includes(`'`)) {
                             guildName.set(message.guild.id, message.guild.name)
@@ -186,26 +182,24 @@ module.exports = class Test extends Command {
                     backupsName.push(backup.guildName + '  **:**');
                     backupsId.push(backup.backupId);
                 }
-                if (backupsName.length === 0 && backupsId.length === 0) return message.channel.send(`▫️ \`ERREUR\` **${message.author.username }**, vous ne posséder pas de backup`)
-                const embed = new EmbedBuilder()
+                if (backupsName.length === 0 && backupsId.length === 0) return message.reply(`▫️ \`ERREUR\` **${message.author.username }**, vous ne posséder pas de backup`)
+                const embed = new Embed(client, guildData)
                     .setTitle(`Liste des backup de __${message.author.username}__:`)
                     .addFields({ name: `📝 Serveur Name`, value: `${backupsName.join('\n')}`, inline: true })
                     .addFields({ name: `📋 Backup Id`, value: `${backupsId.join('\n')}`, inline: true })
-                    .setColor(`${color}`)
-                    .setTimestamp()
                     .setFooter({ text: client.user.username })
-                message.channel.send({ embeds: [embed] })
+                message.reply({ embeds: [embed] })
         }
         if (load) {
-            if (!guildData.isGuildOwner(message.author.id)) return message.channel.send(lang.error.notListOwner)
+            if (!guildData.isGuildOwner(message.author.id)) return message.reply(lang.error.notListOwner)
 
-            if (loadTimeout.has(message.author.id)) return message.channel.send(lang.backup.timeout)
+            if (loadTimeout.has(message.author.id)) return message.reply(lang.backup.timeout)
             const backupId = args[1];
-            if (!backupId) return message.channel.send(lang.backup.noLoadId)
+            if (!backupId) return message.reply(lang.backup.noLoadId)
             const backupToLoad = await client.getUserData(message.author).getBackup(backupId);
-            if (!backupToLoad) return message.channel.send(lang.backup.backupNoFound)
+            if (!backupToLoad) return message.reply(lang.backup.backupNoFound)
 
-            if (backupToLoad.userId !== message.author.id) return message.channel.send(lang.backup.notBackupOwner)
+            if (backupToLoad.userId !== message.author.id) return message.reply(lang.backup.notBackupOwner)
             loadTimeout.set(message.member.id, 'true')
             backup.load(backupToLoad.guildData, message.guild, {
                 clearGuildBeforeRestore: true
@@ -223,10 +217,10 @@ module.exports = class Test extends Command {
         if (show) {
 
             const backupId = args[1];
-            if (!backupId) return message.channel.send(lang.backup.noLoadId)
+            if (!backupId) return message.reply(lang.backup.noLoadId)
             const backup =await client.getUserData(message.author).getBackup(backupId);
-            if (!backup) return message.channel.send(lang.backup.backupNoFound)
-            if (backup.userId !== message.author.id) return message.channel.send(lang.backup.notBackupOwner)
+            if (!backup) return message.reply(lang.backup.backupNoFound)
+            if (backup.userId !== message.author.id) return message.reply(lang.backup.notBackupOwner)
 
             const {guildData} = backup
             const rolesSize = guildData.roles.length;
@@ -239,10 +233,9 @@ module.exports = class Test extends Command {
             for (const cat of categories) {
                 channelsSize.push(cat.children.length)
             }
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
             embed.setTitle(`Information sur la backup ${backupId}`)
             embed.setDescription(`🎨 Nombres de roles - **${rolesSize}**\n▫️ Nombres d'emojis - **${emojisSize}**\n📁 Nombres de catégories - **${categories.length}**\n💬 Nombres de channels - **${channelsSize.reduce((a, b) => a + b, 0)}**\n▫️ Nombres de bannis - **${bansSize}**\n🟡 Backup crée le - **${(() => { const d = new Date(guildData.createdTimestamp); return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; })()}**`)
-            embed.setColor(`${color}`)
             embed.setTimestamp()
             embed.setFooter({ text: client.user.username })
             if (ico !== undefined) {
@@ -256,7 +249,7 @@ module.exports = class Test extends Command {
             const chEmo = client.emojis.cache.get('783422874748584007')
             const rlEmo = client.emojis.cache.get('783422848630521857')
             let filters = (reaction, user) => [chEmo.name, rlEmo.name].includes(reaction.emoji.name) && user.id === message.author.id;
-            const msg = await message.channel.send(lang.loading)
+            const msg = await message.reply(lang.loading)
             const emoji = ['783422848630521857', '783422874748584007']
             for (let emo of emoji) {
                 await msg.react(client.emojis.cache.get(emo))
@@ -282,7 +275,7 @@ module.exports = class Test extends Command {
 
                         msg.edit({ embeds: [embed] }).catch((err) => {
                             if (err.toString().includes('Invalid Form Body')) {
-                                return message.channel.send("Il y a trop de salons à visualiser sur cette backup")
+                                return message.reply("Il y a trop de salons à visualiser sur cette backup")
                             }
                         })
 
@@ -301,7 +294,7 @@ module.exports = class Test extends Command {
                             msg.edit({ embeds: [embed] })
                         } catch (err) {
                             if (err.toString().includes('Invalid Form Body')) {
-                                return message.channel.send("Il y a trop de roles à visualiser sur cette backup")
+                                return message.reply("Il y a trop de roles à visualiser sur cette backup")
                             }
                         }
 
@@ -309,32 +302,31 @@ module.exports = class Test extends Command {
                 })
 
             }).catch((err) => {
-                if (err.toString().includes(`▫️ \`ERROR\`: Unknown column '${backupId}' in 'where clause'`)) return message.channel.send(lang.backup.backupNoFound)
-                return message.channel.send(lang.backup.error)
+                if (err.toString().includes(`▫️ \`ERROR\`: Unknown column '${backupId}' in 'where clause'`)) return message.reply(lang.backup.backupNoFound)
+                return message.reply(lang.backup.error)
             })
 
         }
 
         if (del) {
             const backupId = args[1];
-            if (!backupId) return message.channel.send(lang.backup.noLoadId)
+            if (!backupId) return message.reply(lang.backup.noLoadId)
             const backupCheck = await client.getUserData(message.author).getBackup(backupId)
-            if (!backupCheck) return message.channel.send(lang.backup.backupNoFound)
-            if (backupCheck.userId !== message.author.id) return message.channel.send(lang.backup.notBackupOwner)
+            if (!backupCheck) return message.reply(lang.backup.backupNoFound)
+            if (backupCheck.userId !== message.author.id) return message.reply(lang.backup.notBackupOwner)
 
             await client.getUserData(message.author).deleteBackup(backupId).then(result => {
                 if (result) {
-                    return message.channel.send(lang.backup.successDelete(backupId))
+                    return message.reply(lang.backup.successDelete(backupId))
 
                 }
             })
         }
 
         function updateEmbed(ignoreCh, ignoreRl, ignoreEmo, ignoreBans) {
-            const dd = new EmbedBuilder()
+            const dd = new Embed(client, guildData)
             dd.setTitle(lang.backup.configEmbedT)
             dd.setDescription(lang.backup.configEmbedDesc(ignoreCh, ignoreRl, ignoreEmo, ignoreBans))
-            dd.setColor(`${color}`)
             dd.setTimestamp()
             dd.setFooter({ text: client.user.username });
             msg.edit({ embeds: [dd] })

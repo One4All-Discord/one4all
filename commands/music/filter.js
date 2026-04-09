@@ -28,12 +28,12 @@ module.exports = class Filter extends Command {
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours de lecture.');
         }
 
         const filter = args[0]?.toLowerCase();
         if (!filter || (filter !== 'off' && !AVAILABLE_FILTERS.includes(filter))) {
-            return message.channel.send(
+            return message.reply(
                 `Filtres disponibles: \`${AVAILABLE_FILTERS.join('`, `')}\`, \`off\``
             );
         }
@@ -42,7 +42,7 @@ module.exports = class Filter extends Command {
             queue.filters.ffmpeg.setInputArgs([]);
             const embed = new Embed(client, guildData)
                 .setDescription('Tous les filtres ont été désactivés.');
-            return message.channel.send({ embeds: [embed] });
+            return message.reply({ embeds: [embed] });
         }
 
         await queue.filters.ffmpeg.toggle([filter]);
@@ -52,6 +52,6 @@ module.exports = class Filter extends Command {
         const embed = new Embed(client, guildData)
             .setDescription(`Filtre **${filter}** basculé.\nFiltres actifs: **${activeList}**`);
 
-        message.channel.send({ embeds: [embed] });
+        message.reply({ embeds: [embed] });
     }
 };

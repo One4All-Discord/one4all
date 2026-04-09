@@ -18,7 +18,7 @@ module.exports = class Test extends Command{
         const lang = client.lang(guildData.lang)
         if(!message.mentions.members.first() || message.guild.members.cache.get(args[0])){
             await guildData.clearInvite().then((res) => {
-                return message.channel.send(lang.clearInv.success(message.guild.name))
+                return message.reply(lang.clearInv.success(message.guild.name))
             })
             message.guild.members.cache.forEach(member => {
                 client.getMemberData(message.guild.id, member.user?.id || member.id).clearMemberInvite(false)
@@ -26,7 +26,7 @@ module.exports = class Test extends Command{
         }else{
             const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]) || await message.guild.members.fetch(args[0]);
             client.getMemberData(message.guild.id, member.user?.id || member.id).clearMemberInvite(true)
-            return message.channel.send(lang.clearInv.success(member.user.username))
+            return message.reply(lang.clearInv.success(member.user.username))
         }
 
     }

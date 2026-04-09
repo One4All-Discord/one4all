@@ -35,7 +35,7 @@ module.exports = class Test extends Command {
             dureefiltrer = response => {
                 return response.author.id === message.author.id
             };
-        let msg = await message.channel.send(lang.loading)
+        let msg = await message.reply(lang.loading)
         await msg.react("🕙")
         await msg.react("🏷️")
         await msg.react("🕵️")
@@ -56,26 +56,26 @@ module.exports = class Test extends Command {
                 collector.on('collect', async r => {
                     await r.users.remove(message.author);
                     if (r.emoji.name === '🕙') {
-                        message.channel.send(`🕙 Combien de temps doit durer le giveaway ?`).then(mp => {
+                        message.reply(`🕙 Combien de temps doit durer le giveaway ?`).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(cld => {
                                     let msg = cld.first();
-                                    if (!msg.content.endsWith("d") && !msg.content.endsWith("h") && !msg.content.endsWith("m") && !msg.content.endsWith("s")) return message.channel.send(`🕙 Temps incorrect.`)
+                                    if (!msg.content.endsWith("d") && !msg.content.endsWith("h") && !msg.content.endsWith("m") && !msg.content.endsWith("s")) return message.reply(`🕙 Temps incorrect.`)
                                     time.set(message.guild.id, ms(msg.content))
-                                    message.channel.send(`🕙 Vous avez changé le temps du prochain giveaway à \`${msg.content}\``).then(() => {
+                                    message.reply(`🕙 Vous avez changé le temps du prochain giveaway à \`${msg.content}\``).then(() => {
                                         updateEmbed()
                                     })
                                 });
                         })
                     } else if (r.emoji.name === '🏷️') {
 
-                        message.channel.send(`🏷️ Dans quel channel voulez-vous envoyer le giveaway ?`).then(mp => {
+                        message.reply(`🏷️ Dans quel channel voulez-vous envoyer le giveaway ?`).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(cld => {
                                     let msg = cld.first();
                                     let channel = msg.mentions.channels.first() || msg.guild.channels.cache.get(msg.content)
-                                    if (!channel) return message.channel.send(` 🏷️ Salon incorrect.`)
-                                    message.channel.send(` 🏷️ Vous avez changé le salon du prochain giveaway à \`${channel.name}\``).then(() => {
+                                    if (!channel) return message.reply(` 🏷️ Salon incorrect.`)
+                                    message.reply(` 🏷️ Vous avez changé le salon du prochain giveaway à \`${channel.name}\``).then(() => {
                                         ch.set(message.guild.id, channel.id);
                                         updateEmbed()
                                     })
@@ -84,13 +84,13 @@ module.exports = class Test extends Command {
                         });
 
                     } else if (r.emoji.name === '🕵️') {
-                        message.channel.send(`🕵️ Veuillez entrer le nombre de gagnant`).then(mp => {
+                        message.reply(`🕵️ Veuillez entrer le nombre de gagnant`).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(cld => {
                                     let msg = cld.first();
-                                    if (isNaN(msg.content)) return message.channel.send(`Vous devez entrer uniquement des chiffres.`)
+                                    if (isNaN(msg.content)) return message.reply(`Vous devez entrer uniquement des chiffres.`)
 
-                                    message.channel.send(` 🕵️ Vous avez changé le nombre de gagnants prédéfinis à ${msg.content}`).then(() => {
+                                    message.reply(` 🕵️ Vous avez changé le nombre de gagnants prédéfinis à ${msg.content}`).then(() => {
                                         winner.set(message.guild.id, msg.content);
                                         updateEmbed()
 
@@ -100,19 +100,19 @@ module.exports = class Test extends Command {
                         });
 
                     } else if (r.emoji.name === '🎁') {
-                        message.channel.send(` 🎁 Que voulez-vous faire gagner ?`).then(mp => {
+                        message.reply(` 🎁 Que voulez-vous faire gagner ?`).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(cld => {
                                     let msg = cld.first();
                                     gain.set(message.guild.id, msg.content)
-                                    message.channel.send(`🎁 Désormais lors des prochains giveaway le lot a gagner seras \`${msg.content}\`.`)
+                                    message.reply(`🎁 Désormais lors des prochains giveaway le lot a gagner seras \`${msg.content}\`.`)
                                     updateEmbed()
                                 });
                         });
                     } else if (r.emoji.name === '✅') {
                         let channel = message.guild.channels.cache.get(ch.get(message.guild.id))
-                        if (!channel) return message.channel.send(` ◈ \`ERREUR\` **Erreur rencontrée**: veuillez rédefinir le salon du giveaway.`)
-                        message.channel.send(` ✅ Giveaway lancé dans ${channel}.`)
+                        if (!channel) return message.reply(` ◈ \`ERREUR\` **Erreur rencontrée**: veuillez rédefinir le salon du giveaway.`)
+                        message.reply(` ✅ Giveaway lancé dans ${channel}.`)
                         const gawTime = parseInt(time.get(message.guild.id));
                         client.giveaway.start(channel, {
                             time: gawTime,

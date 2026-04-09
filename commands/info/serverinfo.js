@@ -163,6 +163,6 @@ module.exports = class ServerInfo extends Command {
             embed.setImage(guild.bannerURL({ size: 1024 }));
         }
 
-        message.channel.send({ embeds: [embed] });
+        message.reply({ embeds: [embed] });
     }
 };

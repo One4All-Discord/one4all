@@ -1,7 +1,8 @@
 const Command = require('../../structures/Handler/Command');
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const Embed = require('../../structures/Embed');
+const { PermissionFlagsBits } = require('discord.js');
 
-module.exports = class Test extends Command{
+module.exports = class BanList extends Command {
     constructor() {
         super({
             name: 'allbans',
@@ -12,41 +13,29 @@ module.exports = class Test extends Command{
             clientPermissions: [PermissionFlagsBits.BanMembers],
             userPermissions: [PermissionFlagsBits.BanMembers],
             cooldown: 5
-
         });
     }
-    async run(client, message,args){
 
-    const guildData = client.getGuildData(message.guild.id);
-    const color = guildData.color
-    const lang = client.lang(guildData.lang)
+    async run(client, message, args) {
+        const guildData = client.getGuildData(message.guild.id);
+        const lang = client.lang(guildData.lang);
 
-
-    message.guild.bans.fetch()
-        .then(banned => {
+        message.guild.bans.fetch().then(banned => {
             let list = banned.map(ban => ban.user.username).join('\n');
-            const color = guildData.color
-
             if (list.length >= 1950) list = `${list.slice(0, 1948)}...`;
-            const embed = new EmbedBuilder()
-                .setTimestamp()
-                .setFooter({ text: client.user.username })
-                .setTitle(lang.banlist.title(message.guild))
-                .setDescription(lang.banlist.description(banned, list))
-                .setColor(`${color}`)
-            const embedinf = new EmbedBuilder()
-                .setTimestamp()
-                .setTitle(lang.banlist.title(message.guild))
-                .setFooter({ text: client.user.username })
-                .setDescription(lang.banlist.descriptionInf(banned))
-                .setColor(`${color}`)
+
             if (list.length > 0) {
-                message.channel.send({ embeds: [embed] });
-
+                const embed = new Embed(client, guildData)
+                    .setAuthor({ name: `🔨  ${lang.banlist.title(message.guild)}`, iconURL: client.user.displayAvatarURL() })
+                    .setDescription(lang.banlist.description(banned, list));
+                message.reply({ embeds: [embed] });
             } else {
-                message.channel.send({ embeds: [embedinf] });
-
+                const embed = new Embed(client, guildData)
+                    .setWarning()
+                    .setAuthor({ name: `🔨  ${lang.banlist.title(message.guild)}`, iconURL: client.user.displayAvatarURL() })
+                    .setDescription(lang.banlist.descriptionInf(banned));
+                message.reply({ embeds: [embed] });
             }
-        })
-
-}}
+        });
+    }
+};

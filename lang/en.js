@@ -62,7 +62,7 @@ module.exports = {
         > 🔇 Mute microphone : **${muteCount}**\n\n➡️ Total of members in voice channel : **${count}**`,
     },
     authorinfo: {
-        description: `__**OneforAll**__\n\n*OneforAll is a bot owned by* \`KhdDev\`\n\n**Developer :**\n[KhdDev](https://discord.gg/h69YZHB7Nh) -> Bot & Host\n`,
+        description: `__**OneforAll**__\n\n*OneforAll is a bot owned by* \`KhdDev\`\n\n**Developer :**\n[KhdDev](https://discord.gg/TfwGcCjyfp) -> Bot & Host\n`,
     },
     alladmins: {
         error : `There is 0 admins on server.`,
@@ -396,7 +396,7 @@ module.exports = {
         successChange : `You've correctly change your password !`
     },
     authorinfo: {
-        description: `__**OneforAll**__\n\n*OneforAll is a bot owned by* \`KhdDev\`\n\n**Developer :**\n[KhdDev](https://discord.gg/h69YZHB7Nh) -> Bot & Host\n`,
+        description: `__**OneforAll**__\n\n*OneforAll is a bot owned by* \`KhdDev\`\n\n**Developer :**\n[KhdDev](https://discord.gg/TfwGcCjyfp) -> Bot & Host\n`,
     },
     setlang : {
         title : `Change language`,

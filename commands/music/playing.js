@@ -21,7 +21,7 @@ module.exports = class NowPlaying extends Command {
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours de lecture.');
         }
 
         const track = queue.currentTrack;
@@ -45,6 +45,6 @@ module.exports = class NowPlaying extends Command {
             embed.addFields({ name: '\u200b', value: 'LIVE' });
         }
 
-        message.channel.send({ embeds: [embed] });
+        message.reply({ embeds: [embed] });
     }
 };

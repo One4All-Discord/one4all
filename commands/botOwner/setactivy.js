@@ -28,29 +28,29 @@ module.exports = class Test extends Command {
                     url: "https://www.twitch.tv/discord"
                 }]
             })
-                .then(p => message.channel.send(`${message.author}, Vous avez définis le statut de votre bot en \`${activityName.replace("streaming", " ")}\`.`))
+                .then(p => message.reply(`${message.author}, Vous avez définis le statut de votre bot en \`${activityName.replace("streaming", " ")}\`.`))
                 .catch(e => {
-                    return message.channel.send(`${message.author}, Une erreur a été rencontré. \n **Plus d'informations:** \`🔻\` \`\`\`${e}\`\`\``);
+                    return message.reply(`${message.author}, Une erreur a été rencontré. \n **Plus d'informations:** \`🔻\` \`\`\`${e}\`\`\``);
                 });
 
 
         } else if (args[0] === "playing") {
             client.user.setPresence({activities: [{name: activityName.replace("playing", " "), type: ActivityType.Playing}]})
-                .then(p => message.channel.send(`${message.author}, Vous avez définis le statut de votre bot en \`${activityName.replace("playing", " ")}\`.`))
+                .then(p => message.reply(`${message.author}, Vous avez définis le statut de votre bot en \`${activityName.replace("playing", " ")}\`.`))
                 .catch(e => {
-                    return message.channel.send(`${message.author}, Une erreur a été rencontré. \n **Plus d'informations:** \`🔻\` \`\`\`${e}\`\`\``);
+                    return message.reply(`${message.author}, Une erreur a été rencontré. \n **Plus d'informations:** \`🔻\` \`\`\`${e}\`\`\``);
                 });
         } else if (args[0] === "watching") {
             client.user.setPresence({activities: [{name: activityName.replace("watching", " "), type: ActivityType.Watching}]})
-                .then(p => message.channel.send(`${message.author}, Vous avez définis le statut de votre bot en \`${activityName.replace("watching", " ")}\`.`))
+                .then(p => message.reply(`${message.author}, Vous avez définis le statut de votre bot en \`${activityName.replace("watching", " ")}\`.`))
                 .catch(e => {
-                    return message.channel.send(`${message.author}, Une erreur a été rencontré. \n **Plus d'informations:** \`🔻\` \`\`\`${e}\`\`\``);
+                    return message.reply(`${message.author}, Une erreur a été rencontré. \n **Plus d'informations:** \`🔻\` \`\`\`${e}\`\`\``);
                 });
         } else if (!args[0]) {
-            message.channel.send(`${message.author}, Vous avez fournie aucune valeur pour l'activité`);
+            message.reply(`${message.author}, Vous avez fournie aucune valeur pour l'activité`);
 
         } else if (args[0] && !args[1]) {
-            message.channel.send(`${message.author}, Vous avez fournie aucune valeur pour le nom de l'activié`);
+            message.reply(`${message.author}, Vous avez fournie aucune valeur pour le nom de l'activié`);
 
         }
 

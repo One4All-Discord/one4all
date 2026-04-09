@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder } = require('discord.js');
 const Command = require('../../structures/Handler/Command');
 module.exports = class Test extends Command {
@@ -29,45 +30,43 @@ module.exports = class Test extends Command {
         const add = args[0] === "add";
         const remove = args[0] === 'remove';
         const list = args[0] === 'list';
-        if (!add && !remove && !list && !clear) return message.channel.send(lang.wl.errorSyntaxAdd)
+        if (!add && !remove && !list && !clear) return message.reply(lang.wl.errorSyntaxAdd)
         if (add) {
             const member = message.mentions.members.first() || await message.guild.members.fetch(args[1]);
-            if (!member) return message.channel.send(lang.wl.noMember)
-            if (whitelisted.includes(member.id)) return message.channel.send(lang.wl.errorAlreadyWl(member.user.username))
+            if (!member) return message.reply(lang.wl.noMember)
+            if (whitelisted.includes(member.id)) return message.reply(lang.wl.errorAlreadyWl(member.user.username))
             whitelisted.push(member.id);
             guildData.updateWhitelist = whitelisted;
-            await message.channel.send(lang.wl.successWl(member.user.username));
+            await message.reply(lang.wl.successWl(member.user.username));
 
 
         } else if (remove) {
             const member = message.mentions.members.first() || await message.guild.members.fetch(args[1]);
-            if (!member) return message.channel.send(lang.owner.noMember)
-            if (!whitelisted.includes(member.id)) return message.channel.send(lang.wl.errorNotWl(member.user.username))
+            if (!member) return message.reply(lang.owner.noMember)
+            if (!whitelisted.includes(member.id)) return message.reply(lang.wl.errorNotWl(member.user.username))
             whitelisted = whitelisted.filter(wl => wl !== member.id)
             guildData.updateWhitelist = whitelisted;
-            await message.channel.send(lang.wl.successRmWl(member.user.username));
+            await message.reply(lang.wl.successRmWl(member.user.username));
 
         } else if (list) {
 
             try {
-                let tdata = await message.channel.send(lang.loading)
+                let tdata = await message.reply(lang.loading)
 
                 let p0 = 0;
                 let p1 = 10;
                 let page = 1;
 
 
-                let embed = new EmbedBuilder()
+                let embed = new Embed(client, guildData)
 
                 embed.setTitle(`▫️ Liste des membres whitelist`)
-                    .setColor(`${color}`)
                     .setDescription(whitelisted
                         .filter(x => message.guild.members.cache.get(x))
                         .map(r => r)
                         .map((user, i) => `${i + 1} ・ **<@${message.guild.members.cache.get(user).user.id}>**`)
                         .slice(0, 10)
                         .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(whitelisted.length / 10)}**`)
-                    .setTimestamp()
                     .setFooter({ text: `${client.user.username}` });
 
                 let reac1
@@ -149,13 +148,11 @@ module.exports = class Test extends Command {
                 console.log(err)
             }
         } else if (clear) {
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setTitle(`Confirmation`)
                 .setDescription(lang.whitelisted.clearWl)
                 .setFooter({ text: client.user.username })
-                .setTimestamp()
-                .setColor(`${color}`)
-            const msg = await message.channel.send({ embeds: [embed] })
+            const msg = await message.reply({ embeds: [embed] })
             await msg.react('✅')
             await msg.react('❌')
 
@@ -171,14 +168,14 @@ module.exports = class Test extends Command {
                         whitelisted = []
                         guildData.updateWhitelist = whitelisted;
                         msg.delete()
-                        return message.channel.send(lang.wl.successClearWl)
+                        return message.reply(lang.wl.successClearWl)
 
                     } catch (err) {
                         console.error(err)
-                        return message.channel.send(lang.wl.error)
+                        return message.reply(lang.wl.error)
                     }
                 } else if (r.emoji.name === '❌') {
-                    return message.channel.send(lang.wl.cancel)
+                    return message.reply(lang.wl.cancel)
                 }
             })
 

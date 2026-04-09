@@ -20,12 +20,12 @@ module.exports = class StatsEnableDisable extends Command {
         const lang = client.lang(guildData.lang);
         if (args[0] === "on") {
             await this.connection.query(`UPDATE guildConfig SET statsOn = '1' WHERE guildId = '${message.guild.id}'`).then(() => {
-                message.channel.send(lang.stats.enable).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+                message.reply(lang.stats.enable).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
                 StateManager.emit('statsOnU', message.guild.id, '1');
             });
         } else if (args[0] === "off") {
             await this.connection.query(`UPDATE guildConfig SET statsOn = '0' WHERE guildId = '${message.guild.id}'`).then(() => {
-                message.channel.send(lang.stats.disable).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+                message.reply(lang.stats.disable).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
             });
             StateManager.emit('statsOnU', message.guild.id, '0');
         }

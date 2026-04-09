@@ -17,20 +17,20 @@ module.exports = class Test extends Command{
         const guildData = client.getGuildData(message.guild.id);
         const lang = client.lang(guildData.lang)
         const member = await message.mentions.members.first() || message.guild.members.cache.get(args[0]);
-        if(!member) return message.channel.send(lang.warn.noMember)
+        if(!member) return message.reply(lang.warn.noMember)
         let memberWarns = client.getMemberData(message.guild.id, member.user.id || member.id).warns;
-        if(memberWarns.length < 1)  return message.channel.send(lang.warn.nothingToClear)
+        if(memberWarns.length < 1)  return message.reply(lang.warn.nothingToClear)
         const warnToRemove = args[1];
-        if(isNaN(warnToRemove) && args[1]) return message.channel.send(lang.warn.notNumber)
+        if(isNaN(warnToRemove) && args[1]) return message.reply(lang.warn.notNumber)
         if(!warnToRemove){
             client.getMemberData(message.guild.id, member.user.id || member.id).deleteWarn()
-            return message.channel.send(lang.warn.successClear(member.user.username))
+            return message.reply(lang.warn.successClear(member.user.username))
         }
-        if(parseInt(warnToRemove) > memberWarns.length) return message.channel.send(lang.warn.amountHigherThanWarnTotal)
+        if(parseInt(warnToRemove) > memberWarns.length) return message.reply(lang.warn.amountHigherThanWarnTotal)
         const warnToDelete = memberWarns[parseInt(memberWarns)];
         memberWarns = memberWarns.filter(warn => warn !== warnToDelete);
         client.getMemberData(message.guild.id, member.user.id || member.id).updateWarn = memberWarns;
-        message.channel.send(lang.warn.successDelete(member.user.username, warnToRemove))
+        message.reply(lang.warn.successDelete(member.user.username, warnToRemove))
 
 
     }

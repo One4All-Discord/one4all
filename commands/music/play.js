@@ -1,5 +1,4 @@
 const { PermissionFlagsBits } = require('discord.js');
-const { useQueue } = require('discord-player');
 const Command = require('../../structures/Handler/Command');
 const Embed = require('../../structures/Embed');
 
@@ -17,34 +16,43 @@ module.exports = class Play extends Command {
 
     async run(client, message, args) {
         const guildData = client.getGuildData(message.guild.id);
-        const lang = client.lang(guildData.lang);
         const query = args.join(' ');
 
         if (!message.member.voice.channel) {
-            return message.channel.send('Vous devez être dans un salon vocal pour jouer de la musique.');
+            return message.reply('Vous devez être dans un salon vocal.');
         }
         if (!query) {
-            return message.channel.send('Veuillez spécifier une musique à jouer.');
+            return message.reply('Spécifiez une musique.');
         }
 
         try {
             const { track } = await client.music.play(message.member.voice.channel, query, {
                 nodeOptions: {
                     metadata: { channel: message.channel },
+                    leaveOnEmpty: false,
+                    leaveOnEnd: false,
+                    leaveOnStop: false,
                 },
                 requestedBy: message.author,
             });
 
             const embed = new Embed(client, guildData)
-                .setAuthor({ name: 'Musique ajoutée' })
-                .setDescription(`[**${track.title}**](${track.url}) a été ajoutée à la file d'attente.`)
+                .setAuthor({ name: 'Ajoutée à la file', iconURL: client.user.displayAvatarURL() })
                 .setThumbnail(track.thumbnail)
+                .setDescription(
+                    `**[${track.title}](${track.url})**\n\u200b`
+                )
+                .addFields(
+                    { name: 'Durée', value: `\`${track.duration}\``, inline: true },
+                    { name: 'Source', value: `\`${track.source || 'Inconnu'}\``, inline: true },
+                )
                 .setRequestedBy(message.author);
-
-            message.channel.send({ embeds: [embed] });
+            message.reply({ embeds: [embed] });
         } catch (e) {
             console.error(e);
-            message.channel.send('Une erreur est survenue lors de la lecture.');
+            const embed = new Embed(client, guildData).setError()
+                .setDescription('Impossible de lire cette piste.');
+            message.reply({ embeds: [embed] });
         }
     }
 };

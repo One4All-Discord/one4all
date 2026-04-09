@@ -12,7 +12,7 @@ module.exports = class Test extends Command{
         });
     }
     async run(client, message,args){
-        await message.channel.send(`Je suis en train de redémarrer !`)
+        await message.reply(`Je suis en train de redémarrer !`)
         process.exit()
     }
 }

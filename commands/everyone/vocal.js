@@ -43,7 +43,7 @@ module.exports = class Test extends Command {
             }
 
         }
-        message.channel.send(lang.vocal.msg(count, muteCount, streamingCount, muteHeadSetCount, openMicCount))
+        message.reply(lang.vocal.msg(count, muteCount, streamingCount, muteHeadSetCount, openMicCount))
     }
 };
 

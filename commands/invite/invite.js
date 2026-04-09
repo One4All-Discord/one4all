@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const inviteChannel = new Map();
 const inviteMsg = new Map();
@@ -32,10 +33,8 @@ module.exports = class Test extends Command {
             if (count.join - count.leave > 1) {
                 inv = 'invites'
             }
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setDescription(`${lang.invite.countDesc(message.author.username, count.join - count.leave > 0 ? count.join - count.leave : 0, inv)}\n (__${count.join}__ join, __${count.leave}__ leave, __${count.fake}__ fake, __${count.bonus}__ bonus)`)
-                .setColor(`${color}`)
-                .setTimestamp()
                 .setFooter({ text: client.user.username })
             message.reply({ embeds: [embed] });
         } else if (message.mentions.members.first() || !isNaN(args[0])) {
@@ -46,19 +45,17 @@ module.exports = class Test extends Command {
             if (count.join - count.leave > 1) {
                 inv = 'invites'
             }
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setDescription(`${lang.invite.countDesc(member.user.username, count.join - count.leave > 0 ? count.join - count.leave : 0, inv)}\n (__${count.join}__ join, __${count.leave}__ leave, __${count.fake}__ fake, __${count.bonus}__ bonus)`)
-                .setColor(`${color}`)
-                .setTimestamp()
                 .setFooter({ text: client.user.username })
             message.reply({ embeds: [embed] });
         }
 
         if (config) {
-            if (!guildData.isGuildOwner(message.author.id)) return message.channel.send(lang.error.notListOwner)
+            if (!guildData.isGuildOwner(message.author.id)) return message.reply(lang.error.notListOwner)
 
 
-            const msg = await message.channel.send(lang.loading)
+            const msg = await message.reply(lang.loading)
 
             await msg.react("1️⃣");
             await msg.react("2️⃣");
@@ -77,11 +74,9 @@ module.exports = class Test extends Command {
             }
 
 
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setTitle(lang.invite.titleConfig)
                 .setDescription(lang.invite.descConfig(inviteChannel, message.guild, isOnS, inviteMsg))
-                .setTimestamp()
-                .setColor(`${color}`)
                 .setFooter({ text: client.user.username });
             msg.edit({ embeds: [embed] })
             const data_res = msg.createReactionCollector({ filter: (reaction, user) => user.id === message.author.id, time: 120000 });
@@ -89,7 +84,7 @@ module.exports = class Test extends Command {
                 await reaction.users.remove(message.author);
 
                 if (reaction.emoji.name === "1️⃣") {
-                    let question = await message.channel.send(lang.invite.chQ)
+                    let question = await message.reply(lang.invite.chQ)
                     const filter = m => message.author.id === m.author.id;
                     message.channel.awaitMessages({ filter: filter, 
                         max: 1,
@@ -98,7 +93,7 @@ module.exports = class Test extends Command {
                         await collected.first().delete()
                         question.delete()
                         if (collected.first().content.toLowerCase() === "cancel") {
-                            return message.channel.send(lang.cancel);
+                            return message.reply(lang.cancel);
                         }
                         const response = collected.first().mentions.channels.first();
                         const channelId = response.id;
@@ -110,7 +105,7 @@ module.exports = class Test extends Command {
                         message.reply(lang.invite.timeout)
                     })
                 } else if (reaction.emoji.name === "2️⃣") {
-                    let question = await message.channel.send(lang.invite.msgQ)
+                    let question = await message.reply(lang.invite.msgQ)
                     const filter = m => message.author.id === m.author.id;
                     message.channel.awaitMessages({ filter: filter, 
                         max: 1,
@@ -119,13 +114,13 @@ module.exports = class Test extends Command {
                         await collected.first().delete()
                         question.delete()
                         if (collected.first().content.toLowerCase() === "cancel") {
-                            return message.channel.send(lang.cancel);
+                            return message.reply(lang.cancel);
                         }
                         let response = collected.first().content;
 
 
-                        message.channel.send(lang.invite.successMsg);
-                        message.channel.send(`${response}`);
+                        message.reply(lang.invite.successMsg);
+                        message.reply(`${response}`);
                         inviteMsg.set(message.guild.id, response)
                         updateEmbed()
 
@@ -144,15 +139,13 @@ module.exports = class Test extends Command {
                     const leaveHelp = "${leave}  ・ Sert à afficher le nombre d'invitation leave que l'inviteur possède"
                     const totalMemberHelp = "${memberTotal} ・ Sert à afficher le nombre total de membres sur le serveur"
                     const space = "${space} ・ Sert à faire un retour à la ligne"
-                    const help = new EmbedBuilder()
+                    const help = new Embed(client, guildData)
                         .setTitle(`Help`)
                         .setDescription(lang.invite.helpDesc(invitedHelp, inviterHelp, invitedMention, inviterMention, accountCreate, countHelp, fakeHelp, leaveHelp, totalMemberHelp, space))
-                        .setTimestamp()
-                        .setColor(`${color}`)
                         .setFooter({ text: client.user.username });
-                    message.channel.send({ embeds: [help] })
+                    message.reply({ embeds: [help] })
                 } else if (reaction.emoji.name === "4️⃣") {
-                    let question = await message.channel.send(lang.invite.enableQ)
+                    let question = await message.reply(lang.invite.enableQ)
                     const filter = m => message.author.id === m.author.id;
                     message.channel.awaitMessages({ filter: filter, 
                         max: 1,
@@ -161,7 +154,7 @@ module.exports = class Test extends Command {
                         await collected.first().delete()
                         question.delete()
                         if (collected.first().content.toLowerCase() === "cancel") {
-                            return message.channel.send(lang.cancel);
+                            return message.reply(lang.cancel);
                         } else if (collected.first().content.toLowerCase() === lang.yes) {
 
                             isOnS = '▫️'
@@ -177,7 +170,7 @@ module.exports = class Test extends Command {
 
 
                         } else if (collected.first().content.toLowerCase() !== lang.no || collected.first().content.toLowerCase() !== lang.yes) {
-                            return message.channel.send(lang.error.YesNo)
+                            return message.reply(lang.error.YesNo)
                         }
 
                     }).catch((error) => {
@@ -191,7 +184,7 @@ module.exports = class Test extends Command {
                     return await msg.delete()
                 } else if (reaction.emoji.name === '✅') {
                     await guildData.updateInviteConfig(inviteChannel.get(message.guild.id), inviteMsg.get(message.guild.id), inviteOn.get(message.guild.id)).then(res => {
-                        message.channel.send(`Configuration save`);
+                        message.reply(`Configuration save`);
 
 
                         return msg.delete()
@@ -204,7 +197,7 @@ module.exports = class Test extends Command {
                 inviteMsg.delete(message.guild.id)
                 inviteOn.delete(message.guild.id)
                 if (reason === "time") {
-                    message.channel.send(lang.error.timeout)
+                    message.reply(lang.error.timeout)
 
                 }
             });
@@ -237,7 +230,7 @@ module.exports = class Test extends Command {
             invitesCount.clear()
             console.timeEnd("inv")
 
-            message.channel.send(lang.invite.syncSuccess)
+            message.reply(lang.invite.syncSuccess)
         }
 
     }

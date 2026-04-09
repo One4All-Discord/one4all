@@ -156,6 +156,6 @@ module.exports = class UserInfo extends Command {
             }
         } catch {}
 
-        return message.channel.send({ embeds: [embed] });
+        return message.reply({ embeds: [embed] });
     }
 };

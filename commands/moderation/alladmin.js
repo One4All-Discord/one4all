@@ -1,7 +1,8 @@
 const Command = require('../../structures/Handler/Command');
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const Embed = require('../../structures/Embed');
+const { PermissionFlagsBits } = require('discord.js');
 
-module.exports = class Test extends Command{
+module.exports = class AllAdmins extends Command {
     constructor() {
         super({
             name: 'alladmins',
@@ -11,128 +12,72 @@ module.exports = class Test extends Command{
             clientPermissions: [PermissionFlagsBits.ManageGuild],
             userPermissions: [PermissionFlagsBits.Administrator],
             cooldown: 5
-
         });
     }
-    async run(client, message,args){
 
-    const guildData = client.getGuildData(message.guild.id);
-    const tempdata = []
-    const color = guildData.color
-    const lang = client.lang(guildData.lang)
-    const admins = message.guild.members.cache.filter(
-        (m) => m.permissions.has(PermissionFlagsBits.Administrator)
-    ).map(m => tempdata.push(m.user.id))
+    async run(client, message, args) {
+        const guildData = client.getGuildData(message.guild.id);
+        const lang = client.lang(guildData.lang);
+        const tempdata = [];
 
+        message.guild.members.cache.filter(
+            (m) => m.permissions.has(PermissionFlagsBits.Administrator)
+        ).map(m => tempdata.push(m.user.id));
 
-
-    let noembed = new EmbedBuilder()
-        .setColor(`${color}`)
-        .setDescription(lang.alladmins.error)
-        .setTitle(lang.alladmins.list)
-        .setTimestamp()
-        .setFooter({ text: `${client.user.username}`, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-    if (tempdata.length === 0) return message.channel.send({ embeds: [noembed] })
-
-
-    try {
-        let tdata = await message.channel.send(lang.loading)
-
-        let p0 = 0;
-        let p1 = 10;
-        let page = 1;
-
-        let embed = new EmbedBuilder()
-
-        embed.setTitle(`${lang.alladmins.list} ${tempdata.length}`)
-            .setColor(`${color}`)
-            .setDescription(tempdata
-                .filter(x => message.guild.members.cache.get(x))
-                .map(r => r)
-                .map((user, i) => `${i + 1} ・ **<@${message.guild.members.cache.get(user).user.id}>**`)
-                .slice(0, 10)
-                .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempdata.length / 10)}**`)
-            .setTimestamp()
-            .setFooter({ text: `${client.user.username}` });
-
-        let reac1
-        let reac2
-        let reac3
-
-        if (tempdata.length > 10) {
-            reac1 = await tdata.react("⬅");
-            reac2 = await tdata.react("❌");
-            reac3 = await tdata.react("➡");
+        if (tempdata.length === 0) {
+            const embed = new Embed(client, guildData)
+                .setWarning()
+                .setAuthor({ name: '🛡️  Administrateurs', iconURL: client.user.displayAvatarURL() })
+                .setDescription(lang.alladmins.error);
+            return message.reply({ embeds: [embed] });
         }
 
-        tdata.edit({ embeds: [embed] });
+        try {
+            let tdata = await message.reply(lang.loading);
+            let p0 = 0, p1 = 10, page = 1;
 
-        const data_res = tdata.createReactionCollector({ filter: (reaction, user) => user.id === message.author.id, time: 120000 });
+            const embed = new Embed(client, guildData)
+                .setAuthor({ name: `🛡️  Administrateurs — ${tempdata.length}`, iconURL: client.user.displayAvatarURL() });
 
-        data_res.on("collect", async (reaction) => {
+            const buildDesc = (start, end, pg) => tempdata
+                .filter(x => message.guild.members.cache.get(x))
+                .map((user, i) => `\`${i + 1}\` ▸ <@${message.guild.members.cache.get(user).user.id}>`)
+                .slice(start, end)
+                .join('\n') + `\n\nPage **${pg}** / **${Math.ceil(tempdata.length / 10)}**`;
 
-            if (reaction.emoji.name === "⬅") {
+            embed.setDescription(buildDesc(p0, p1, page));
 
-                p0 = p0 - 10;
-                p1 = p1 - 10;
-                page = page - 1
-
-                if (p0 < 0) {
-                    return
-                }
-                if (p0 === undefined || p1 === undefined) {
-                    return
-                }
-
-
-                embed.setDescription(tempdata
-                    .filter(x => message.guild.members.cache.get(x))
-                    .map(r => r)
-                    .map((user, i) => `${i + 1} ・  **<@${message.guild.members.cache.get(user).user.id}>**`)
-                    .slice(p0, p1)
-                    .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempdata.length / 10)}**`)
-                tdata.edit({ embeds: [embed] });
-
+            if (tempdata.length > 10) {
+                await tdata.react('⬅');
+                await tdata.react('❌');
+                await tdata.react('➡');
             }
 
-            if (reaction.emoji.name === "➡") {
+            tdata.edit({ embeds: [embed] });
 
-                p0 = p0 + 10;
-                p1 = p1 + 10;
-
-                page++;
-
-                if (p1 > tempdata.length + 10) {
-                    return
+            const data_res = tdata.createReactionCollector({ filter: (reaction, user) => user.id === message.author.id, time: 120000 });
+            data_res.on('collect', async (reaction) => {
+                if (reaction.emoji.name === '⬅') {
+                    p0 -= 10; p1 -= 10; page--;
+                    if (p0 < 0) return;
+                    embed.setDescription(buildDesc(p0, p1, page));
+                    tdata.edit({ embeds: [embed] });
                 }
-                if (p0 === undefined || p1 === undefined) {
-                    return
+                if (reaction.emoji.name === '➡') {
+                    p0 += 10; p1 += 10; page++;
+                    if (p1 > tempdata.length + 10) return;
+                    embed.setDescription(buildDesc(p0, p1, page));
+                    tdata.edit({ embeds: [embed] });
                 }
-
-
-                embed.setDescription(tempdata
-                    .filter(x => message.guild.members.cache.get(x))
-                    .map(r => r)
-                    .map((user, i) => `${i + 1} ・ **<@${message.guild.members.cache.get(user).user.id}>**`)
-                    .slice(p0, p1)
-                    .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempdata.length / 10)}**`)
-                tdata.edit({ embeds: [embed] });
-
-            }
-
-            if (reaction.emoji.name === "❌") {
-                data_res.stop()
-                await tdata.reactions.removeAll()
-                return tdata.delete();
-            }
-
-            await reaction.users.remove(message.author.id);
-
-        })
-
-    } catch (err) {
-        console.log(err)
+                if (reaction.emoji.name === '❌') {
+                    data_res.stop();
+                    await tdata.reactions.removeAll();
+                    return tdata.delete();
+                }
+                await reaction.users.remove(message.author.id);
+            });
+        } catch (err) {
+            console.log(err);
+        }
     }
-}};
-
-
+};

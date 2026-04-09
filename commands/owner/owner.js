@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder } = require('discord.js');
 const Command = require('../../structures/Handler/Command');
 module.exports = class Test extends Command {
@@ -22,7 +23,7 @@ module.exports = class Test extends Command {
         const remove = args[0] === 'remove';
         const clear = args[0] === 'clear';
         const list = args[0] === 'list';
-        if (!add && !remove && !list && !clear) return message.channel.send(lang.owner.errorSyntax)
+        if (!add && !remove && !list && !clear) return message.reply(lang.owner.errorSyntax)
 
         let owners = guildData.owners;
         while (owners[0] === '') {
@@ -31,40 +32,38 @@ module.exports = class Test extends Command {
 
         if (add) {
             const member = message.mentions.members.first() || await message.guild.members.fetch(args[1]);
-            if (!member) return message.channel.send(lang.owner.noMember)
-            if (owners.includes(member.id)) return message.channel.send(lang.owner.errorAlreadyOwner(member.user.username))
+            if (!member) return message.reply(lang.owner.noMember)
+            if (owners.includes(member.id)) return message.reply(lang.owner.errorAlreadyOwner(member.user.username))
             owners.push(member.id);
             guildData.updateOwner = owners;
-            await message.channel.send(lang.owner.successOwner(member.user.username));
+            await message.reply(lang.owner.successOwner(member.user.username));
 
         } else if (remove) {
             const member = message.mentions.members.first() || await message.guild.members.fetch(args[1]);
-            if (!member) return message.channel.send(lang.owner.noMember)
-            if (!owners.includes(member.id)) return message.channel.send(lang.owner.errorNotOwner(member.user.username))
+            if (!member) return message.reply(lang.owner.noMember)
+            if (!owners.includes(member.id)) return message.reply(lang.owner.errorNotOwner(member.user.username))
             owners = owners.filter(ow => ow !== member.id)
             guildData.updateOwner = owners;
-            await message.channel.send(lang.owner.successRmOwner(member.user.username));
+            await message.reply(lang.owner.successRmOwner(member.user.username));
 
         } else if (list) {
             try {
-                let tdata = await message.channel.send(lang.loading)
+                let tdata = await message.reply(lang.loading)
 
                 let p0 = 0;
                 let p1 = 10;
                 let page = 1;
 
 
-                let embed = new EmbedBuilder()
+                let embed = new Embed(client, guildData)
 
                 embed.setTitle(lang.owner.titleList)
-                    .setColor(`${color}`)
                     .setDescription(owners
                         .filter(x => message.guild.members.cache.get(x))
                         .map(r => r)
                         .map((user, i) => `${i + 1} ・ **<@${message.guild.members.cache.get(user).user.id}>**`)
                         .slice(0, 10)
                         .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(owners.length / 10)}**`)
-                    .setTimestamp()
                     .setFooter({ text: `${client.user.username}` });
 
                 let reac1
@@ -149,13 +148,11 @@ module.exports = class Test extends Command {
         } else if (clear) {
 
 
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setTitle(`Confirmation`)
                 .setDescription(lang.owner.clearOwner)
                 .setFooter({ text: client.user.username })
-                .setTimestamp()
-                .setColor(`${color}`)
-            const msg = await message.channel.send({ embeds: [embed] })
+            const msg = await message.reply({ embeds: [embed] })
             await msg.react('✅')
             await msg.react('❌')
 
@@ -170,14 +167,14 @@ module.exports = class Test extends Command {
                         owners = []
                         guildData.updateOwner = owners;
                         msg.delete()
-                        return message.channel.send(lang.owner.successClearOwner)
+                        return message.reply(lang.owner.successClearOwner)
 
                     } catch (err) {
                         console.error(err)
-                        return message.channel.send(lang.owner.error)
+                        return message.reply(lang.owner.error)
                     }
                 } else if (r.emoji.name === '❌') {
-                    return message.channel.send(lang.owner.cancel)
+                    return message.reply(lang.owner.cancel)
                 }
             })
 

@@ -1,9 +1,10 @@
 const {DateTime} = require('luxon');
 const Event = require('../../structures/Handler/Event');
-const { EmbedBuilder, ChannelType, PermissionFlagsBits, ActivityType } = require('discord.js');
+const { EmbedBuilder, ChannelType, PermissionFlagsBits, ActivityType, SlashCommandBuilder, REST, Routes } = require('discord.js');
 const {GiveawaysManager} = require('discord-giveaways')
 const cron = require('node-cron')
 const Coins = require('../../utils/StartCoins')
+const Embed = require('../../structures/Embed')
 module.exports = class Ready extends Event {
     constructor() {
         super({
@@ -124,9 +125,24 @@ module.exports = class Ready extends Event {
             status: 'online',
         });
 
+        // Register slash commands
+        try {
+            const commands = [
+                new SlashCommandBuilder()
+                    .setName('ping')
+                    .setDescription('Affiche la latence du bot')
+                    .toJSON(),
+            ];
+            const rest = new REST({ version: '10' }).setToken(client.token);
+            await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
+            console.log('[SLASH] Slash commands registered');
+        } catch (e) {
+            console.error('[SLASH]', e.message);
+        }
+
         // Send restart notification
         try {
-            const restartChannel = await client.channels.fetch('1490456871604060220');
+            const restartChannel = client.config.devLogChannel ? await client.channels.fetch(client.config.devLogChannel) : null;
             if (restartChannel) {
                 const embed = new EmbedBuilder()
                     .setColor('#00ff00')

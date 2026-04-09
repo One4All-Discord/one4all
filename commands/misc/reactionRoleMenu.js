@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits, ChannelType, Util } = require('discord.js');
 
 const chs = new Map();
@@ -30,7 +31,7 @@ module.exports = class Test extends Command {
         // isDelete.set(message.guild.id, false)
 
         const color = guildData.color
-        const msg = await message.channel.send(lang.loading)
+        const msg = await message.reply(lang.loading)
         await msg.react('📖')
         await msg.react('🆔')
         await msg.react('💠')
@@ -38,12 +39,11 @@ module.exports = class Test extends Command {
         await msg.react('📛')
         await msg.react('❌')
         await msg.react('✅')
-        let embed = new EmbedBuilder()
+        let embed = new Embed(client, guildData)
             .setTitle(lang.reactionRole.embedTitle)
             .setDescription(lang.reactionRole.embedDescription(chs.get(message.guild.id), msgId.get(message.guild.id), ['Non définie']))
             .setFooter({ text: client.user.username })
             .setTimestamp()
-            .setColor(`${color}`);
 
         const filter = (reaction, user) => ['📖', '🆔', '💠', '🚫', '📛', '❌', '✅'].includes(reaction.emoji.name) && user.id === message.author.id,
             dureefiltrer = response => {
@@ -55,18 +55,18 @@ module.exports = class Test extends Command {
             collector.on('collect', async r => {
                 await r.users.remove(message.author);
                 if (r.emoji.name === '📖') {
-                    await message.channel.send(lang.reactionRole.chQ).then(mp => {
+                    await message.reply(lang.reactionRole.chQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 50000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (msg.content.toLowerCase() === "cancel") {
-                                    const reply = await message.channel.send(lang.cancel)
+                                    const reply = await message.reply(lang.cancel)
                                     await setTimeout(() => reply.delete().catch(() => {}), 2000)
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
                                 }
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content != 'cancel') {
-                                    const replyMsg = await message.channel.send(lang.counter.errorNotChannel);
+                                    const replyMsg = await message.reply(lang.counter.errorNotChannel);
                                     await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -80,12 +80,12 @@ module.exports = class Test extends Command {
                                         console.log("err", err)
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== "cancel") ch = msg.mentions.channels.first();
-                                if (ch.type !== ChannelType.GuildText) await message.channel.send(lang.reactionRole.notText).then((e) => {
+                                if (ch.type !== ChannelType.GuildText) await message.reply(lang.reactionRole.notText).then((e) => {
                                     return setTimeout(() => e.delete().catch(() => {}), 2000)
                                 })
                                 if (msg.content !== "cancel" && ch.type === ChannelType.GuildText) {
 
-                                    const replyMsg = message.channel.send(lang.reactionRole.successCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.reactionRole.successCh(ch)).then((replyMSG) => {
                                         chs.set(message.guild.id, ch.id)
 
                                         setTimeout(async () => {
@@ -101,20 +101,20 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name === '🆔') {
-                    await message.channel.send(lang.reactionRole.msgIdQ).then(mp => {
+                    await message.reply(lang.reactionRole.msgIdQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 50000})
                             .then(async cld => {
                                 let msg = cld.first();
-                                if (msg.content.toLowerCase() === 'cancel') return message.channel.send(lang.cancel)
+                                if (msg.content.toLowerCase() === 'cancel') return message.reply(lang.cancel)
 
                                 let msgIdF
-                                if (isNaN(msg.content)) return message.channel.send(lang.reactionRole.notId).then(rp => setTimeout(() => {
+                                if (isNaN(msg.content)) return message.reply(lang.reactionRole.notId).then(rp => setTimeout(() => {
                                     rp.delete()
                                     msg.delete()
                                     mp.delete()
                                 }, 2000))
                                 // console.log(typeof chs.get(message.guild.id == null))
-                                if (chs.get(message.guild.id === 'Non définie')) return message.channel.send(lang.reactionRole.noChannel).then(rp => setTimeout(() => {
+                                if (chs.get(message.guild.id === 'Non définie')) return message.reply(lang.reactionRole.noChannel).then(rp => setTimeout(() => {
                                     rp.delete()
                                     msg.delete()
                                     mp.delete()
@@ -124,7 +124,7 @@ module.exports = class Test extends Command {
                                     msgIdF = await message.guild.channels.cache.get(chs.get(message.guild.id)).messages.fetch(msg.content)
 
                                 } catch (err) {
-                                    return await message.channel.send(lang.reactionRole.noChannel).then(rp => setTimeout(() => {
+                                    return await message.reply(lang.reactionRole.noChannel).then(rp => setTimeout(() => {
                                         rp.delete()
                                         msg.delete()
                                         mp.delete()
@@ -137,7 +137,7 @@ module.exports = class Test extends Command {
                                     await msg.delete();
                                 }, 2000)
                                 if (guildData.reactRoles.has(msgIdF.id)) {
-                                    return await message.channel.send(lang.reactionRole.alreadyReact).then(rp => setTimeout(() => {
+                                    return await message.reply(lang.reactionRole.alreadyReact).then(rp => setTimeout(() => {
                                         rp.delete()
                                         msg.delete()
                                         mp.delete()
@@ -151,18 +151,18 @@ module.exports = class Test extends Command {
                     })
                 } else if (r.emoji.name === '💠') {
 
-                    await message.channel.send(lang.reactionRole.roleQ).then(mp => {
+                    await message.reply(lang.reactionRole.roleQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 50000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (msg.content.toLowerCase() === "cancel") {
-                                    const reply = await message.channel.send(lang.cancel)
+                                    const reply = await message.reply(lang.cancel)
                                     await setTimeout(() => reply.delete().catch(() => {}), 2000)
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
                                 }
                                 if (!msg.mentions.roles.first() && isNaN(msg.content) && msg.content != 'cancel') {
-                                    const replyMsg = await message.channel.send(lang.reactionRole.noRole);
+                                    const replyMsg = await message.reply(lang.reactionRole.noRole);
                                     await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -173,7 +173,7 @@ module.exports = class Test extends Command {
                                     try {
                                         role = message.guild.roles.cache.get(msg.content)
                                         if (role.managed) {
-                                            const replyMsg = await message.channel.send(lang.reactionRole.managedRole);
+                                            const replyMsg = await message.reply(lang.reactionRole.managedRole);
                                             await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                             await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                             return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -184,7 +184,7 @@ module.exports = class Test extends Command {
                                 } else if (msg.mentions.roles.first() && msg.content !== "cancel") role = msg.mentions.roles.first();
                                 for (const [key, value] of emojiRoleMapping) {
                                     if (value === role.id) {
-                                        const replyMsg = await message.channel.send(lang.reactionRole.roleAlready);
+                                        const replyMsg = await message.reply(lang.reactionRole.roleAlready);
                                         await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                         await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                         return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -192,7 +192,7 @@ module.exports = class Test extends Command {
 
                                 }
 
-                                await message.channel.send(lang.reactionRole.emojiQ).then(async mps => {
+                                await message.reply(lang.reactionRole.emojiQ).then(async mps => {
                                     mps.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 50000})
                                         .then(async cld => {
                                             let msg = cld.first();
@@ -200,7 +200,7 @@ module.exports = class Test extends Command {
                                             let emoji = Util.parseEmoji(msg.content);
                                             if (emoji.id == null) {
                                                 if (emojiRoleMapping.has(emoji.name)) {
-                                                    const replyMsg = await message.channel.send(lang.reactionRole.emojiAlready);
+                                                    const replyMsg = await message.reply(lang.reactionRole.emojiAlready);
                                                     await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -227,7 +227,7 @@ module.exports = class Test extends Command {
                                                     }
                                                 }
                                                 if (emojis === undefined) {
-                                                    await message.channel.send(lang.reactionRole.emojiDoesNotExist).then(async mp => {
+                                                    await message.reply(lang.reactionRole.emojiDoesNotExist).then(async mp => {
                                                         mp.channel.awaitMessages({ filter: dureefiltrer, 
                                                             max: 1,
                                                             time: 50000
@@ -237,10 +237,10 @@ module.exports = class Test extends Command {
                                                                 // let custom = Util.parseEmoji(emoji);
                                                                 let link = `https://cdn.discordapp.com/emojis/${emoji.id}.${emoji.animated ? "gif" : "png"}`
                                                                 message.guild.emojis.create(link, name, {reason: `emoji add par ${message.author.username}`}).then(async (em) => {
-                                                                    message.channel.send(lang.addemoji.success(name))
+                                                                    message.reply(lang.addemoji.success(name))
                                                                     let emojis = message.guild.emojis.cache.get(em.id)
                                                                     if (emojiRoleMapping.has(emojis.id)) {
-                                                                        const replyMsg = await message.channel.send(lang.reactionRole.emojiAlready);
+                                                                        const replyMsg = await message.reply(lang.reactionRole.emojiAlready);
                                                                         await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                                                         await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                                                         return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -255,7 +255,7 @@ module.exports = class Test extends Command {
                                                                     }, 2000)
                                                                 }).catch(err => {
                                                                     console.log(err)
-                                                                    message.channel.send(lang.addemoji.error(name))
+                                                                    message.reply(lang.addemoji.error(name))
 
                                                                 })
 
@@ -264,7 +264,7 @@ module.exports = class Test extends Command {
 
                                                 } else {
                                                     if (emojiRoleMapping.has(emojis.id)) {
-                                                        const replyMsg = await message.channel.send(lang.reactionRole.emojiAlready);
+                                                        const replyMsg = await message.reply(lang.reactionRole.emojiAlready);
                                                         await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                                         await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                                         return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -287,25 +287,25 @@ module.exports = class Test extends Command {
                     })
 
                 } else if (r.emoji.name == '🚫') {
-                    await message.channel.send(lang.reactionRole.roleDelQ).then(mp => {
+                    await message.reply(lang.reactionRole.roleDelQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 50000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (emojiRoleMapping.size == 0) {
-                                    const reply = await message.channel.send(lang.reactionRole.noRole)
+                                    const reply = await message.reply(lang.reactionRole.noRole)
                                     await setTimeout(() => reply.delete().catch(() => {}), 2000)
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
 
                                 }
                                 if (msg.content.toLowerCase() == "cancel") {
-                                    const reply = await message.channel.send(lang.cancel)
+                                    const reply = await message.reply(lang.cancel)
                                     await setTimeout(() => reply.delete().catch(() => {}), 2000)
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
                                 }
                                 if (!msg.mentions.roles.first() && isNaN(msg.content) && msg.content != 'cancel') {
-                                    const replyMsg = await message.channel.send(lang.reactionRole.noRole);
+                                    const replyMsg = await message.reply(lang.reactionRole.noRole);
                                     await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -316,7 +316,7 @@ module.exports = class Test extends Command {
                                     try {
                                         role = message.guild.roles.cache.get(msg.content)
                                         if (role.managed) {
-                                            const replyMsg = await message.channel.send(lang.reactionRole.managedRole);
+                                            const replyMsg = await message.reply(lang.reactionRole.managedRole);
                                             await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                             await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                             return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -327,7 +327,7 @@ module.exports = class Test extends Command {
                                 } else if (msg.mentions.roles.first() && msg.content !== "cancel") role = msg.mentions.roles.first();
                                 for (const [key, value] of emojiRoleMapping) {
                                     if (value !== role.id) {
-                                        const replyMsg = await message.channel.send(lang.reactionRole.roleNotFound);
+                                        const replyMsg = await message.reply(lang.reactionRole.roleNotFound);
                                         await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                         await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                         return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -344,7 +344,7 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name === '❌') {
-                    message.channel.send(lang.reactionRole.cancel).then((mp) => {
+                    message.reply(lang.reactionRole.cancel).then((mp) => {
                         msgId.delete(message.guild.id);
                         chs.delete(message.guild.id);
                         emojiRoleMapping.clear();
@@ -358,18 +358,18 @@ module.exports = class Test extends Command {
 
 
                 } else if (r.emoji.name === '📛') {
-                    await message.channel.send(lang.reactionRole.chDeleteQ).then(mp => {
+                    await message.reply(lang.reactionRole.chDeleteQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 50000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (msg.content.toLowerCase() === "cancel") {
-                                    const reply = await message.channel.send(lang.cancel)
+                                    const reply = await message.reply(lang.cancel)
                                     await setTimeout(() => reply.delete().catch(() => {}), 2000)
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
                                 }
                                 if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'cancel') {
-                                    const replyMsg = await message.channel.send(lang.counter.errorNotChannel);
+                                    const replyMsg = await message.reply(lang.counter.errorNotChannel);
                                     await setTimeout(() => replyMsg.delete().catch(() => {}), 2000);
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
@@ -383,12 +383,12 @@ module.exports = class Test extends Command {
                                         console.log("err", err)
                                     }
                                 } else if (msg.mentions.channels.first() && msg.content !== "cancel") ch = msg.mentions.channels.first();
-                                if (ch.type !== ChannelType.GuildText) await message.channel.send(lang.reactionRole.notText).then((e) => {
+                                if (ch.type !== ChannelType.GuildText) await message.reply(lang.reactionRole.notText).then((e) => {
                                     return setTimeout(() => e.delete().catch(() => {}), 2000)
                                 })
                                 if (msg.content !== "cancel" && ch.type === ChannelType.GuildText) {
 
-                                    const replyMsg = message.channel.send(lang.reactionRole.successCh(ch)).then((replyMSG) => {
+                                    const replyMsg = message.reply(lang.reactionRole.successCh(ch)).then((replyMSG) => {
 
 
                                         setTimeout(async () => {
@@ -399,18 +399,18 @@ module.exports = class Test extends Command {
 
                                     })
                                 }
-                                await message.channel.send(lang.reactionRole.msgDeleteQ).then(mp => {
+                                await message.reply(lang.reactionRole.msgDeleteQ).then(mp => {
                                     mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 50000})
                                         .then(async cld => {
                                             let msg = cld.first();
                                             if (msg.content.toLowerCase() === "cancel") {
-                                                const reply = await message.channel.send(lang.cancel)
+                                                const reply = await message.reply(lang.cancel)
                                                 await setTimeout(() => reply.delete().catch(() => {}), 2000)
                                                 await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                                 return await setTimeout(() => mp.delete().catch(() => {}), 2000)
                                             }
                                             if (isNaN(msg.content) && msg.content !== 'cancel') {
-                                                const reply = await message.channel.send(lang.reactionRole.invalid).then((replyMSG) => {
+                                                const reply = await message.reply(lang.reactionRole.invalid).then((replyMSG) => {
                                                     setTimeout(async () => {
                                                         await replyMSG.delete();
                                                         await mp.delete();
@@ -424,7 +424,7 @@ module.exports = class Test extends Command {
 
                                                         await guildData.newReactrole(fetchedMsg.id).then(async (res) => {
 
-                                                            const reply = await message.channel.send(lang.reactionRole.successDel).then(async (replyMSG) => {
+                                                            const reply = await message.reply(lang.reactionRole.successDel).then(async (replyMSG) => {
                                                                 setTimeout(async () => {
                                                                     await replyMSG.delete();
                                                                     await mp.delete();
@@ -440,7 +440,7 @@ module.exports = class Test extends Command {
 
                                                 } catch (err) {
                                                     console.log(err)
-                                                    const reply = await message.channel.send(lang.reactionRole.msgNotFound).then(async (replyMSG) => {
+                                                    const reply = await message.reply(lang.reactionRole.msgNotFound).then(async (replyMSG) => {
                                                         setTimeout(async () => {
                                                             await replyMSG.delete();
                                                             await mp.delete();
@@ -463,13 +463,13 @@ module.exports = class Test extends Command {
 
                 } else if (r.emoji.name === '✅') {
                     if (msgId.get(message.guild.id) == "Non définie") {
-                        return await message.channel.send(lang.reactionRole.noMsg).then(async (replyMSG) => {
+                        return await message.reply(lang.reactionRole.noMsg).then(async (replyMSG) => {
                             setTimeout(async () => {
                                 return await replyMSG.delete();
                             }, 2000)
                         })
                     } else if (emojiRoleMapping.size == 0) {
-                        return await message.channel.send(lang.reactionRole.noEmoji).then(async (replyMSG) => {
+                        return await message.reply(lang.reactionRole.noEmoji).then(async (replyMSG) => {
                             setTimeout(async () => {
                                 return await replyMSG.delete();
 
@@ -525,7 +525,7 @@ module.exports = class Test extends Command {
             });
             collector.on('end', async (collected, reason) => {
                 if (reason === 'time') {
-                    const replyMsg = await message.channel.send(lang.error.timeout)
+                    const replyMsg = await message.reply(lang.error.timeout)
                     msgId.delete(message.guild.id);
                     chs.delete(message.guild.id);
                     emojiRoleMapping.clear();

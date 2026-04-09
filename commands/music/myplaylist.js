@@ -51,24 +51,24 @@ module.exports = class MyPlaylist extends Command {
                 .setDescription(description)
                 .setRequestedBy(message.author);
 
-            return message.channel.send({ embeds: [embed] });
+            return message.reply({ embeds: [embed] });
         }
 
         // Playlist name given: show songs in that playlist with pagination
         if (!authorPlaylist || authorPlaylist.length === 0) {
-            return message.channel.send('Aucune playlist sauvegardee.');
+            return message.reply('Aucune playlist sauvegardee.');
         }
 
         const playlistName = args.join(' ');
         const playlist = authorPlaylist.find(pl => pl.name === playlistName);
 
         if (!playlist) {
-            return message.channel.send(lang.music.playlist.notFound);
+            return message.reply(lang.music.playlist.notFound);
         }
 
         const songs = playlist.song;
         if (!songs || songs.length === 0) {
-            return message.channel.send('Cette playlist est vide.');
+            return message.reply('Cette playlist est vide.');
         }
 
         const songsPerPage = 20;
@@ -96,7 +96,7 @@ module.exports = class MyPlaylist extends Command {
             return embed;
         };
 
-        const msg = await message.channel.send({ embeds: [generateEmbed(currentPage)] });
+        const msg = await message.reply({ embeds: [generateEmbed(currentPage)] });
 
         // Only add pagination if more than one page
         if (totalPages <= 1) return;

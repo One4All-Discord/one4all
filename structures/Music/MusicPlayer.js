@@ -1,5 +1,6 @@
 const { Player, GuildQueueEvent } = require('discord-player');
 const { DefaultExtractors } = require('@discord-player/extractor');
+const { YoutubeiExtractor } = require('discord-player-youtubei');
 const Embed = require('../Embed');
 
 class MusicPlayer {
@@ -10,8 +11,9 @@ class MusicPlayer {
 
     async init() {
         await this.player.extractors.loadMulti(DefaultExtractors);
+        await this.player.extractors.register(YoutubeiExtractor, {});
         this._registerEvents();
-        console.log('[MUSIC] Player initialized with all extractors');
+        console.log('[MUSIC] Player initialized with all extractors (+ YouTube)');
     }
 
     _registerEvents() {
@@ -19,24 +21,21 @@ class MusicPlayer {
 
         player.events.on(GuildQueueEvent.PlayerStart, (queue, track) => {
             const guildData = client.getGuildData(queue.guild.id);
-            const lang = client.lang(guildData.lang);
 
             const embed = new Embed(client, guildData)
                 .setAuthor({ name: 'En lecture', iconURL: client.user.displayAvatarURL() })
-                .setDescription([
-                    `> **[${track.title}](${track.url})**`,
-                    `> Duree: \`${track.duration}\` | Source: \`${track.source || 'Inconnu'}\``,
-                ].join('\n'))
                 .setThumbnail(track.thumbnail)
+                .setDescription(
+                    `**[${track.title}](${track.url})**\n\u200b`
+                )
                 .addFields(
-                    {
-                        name: 'File d\'attente',
-                        value: `> Volume: \`${queue.node.volume}%\` | Tracks: \`${queue.tracks.size}\` | Loop: \`${_loopName(queue.repeatMode)}\``,
-                    }
+                    { name: 'Durée', value: `\`${track.duration}\``, inline: true },
+                    { name: 'Source', value: `\`${track.source || 'Inconnu'}\``, inline: true },
+                    { name: 'En file', value: `\`${queue.tracks.size}\``, inline: true },
                 );
 
             if (track.requestedBy) {
-                embed.setFooter({ text: `Demande par ${track.requestedBy.username}`, iconURL: track.requestedBy.displayAvatarURL() });
+                embed.setFooter({ text: track.requestedBy.username, iconURL: track.requestedBy.displayAvatarURL() });
             }
 
             queue.metadata.channel.send({ embeds: [embed] }).catch(() => {});
@@ -47,7 +46,7 @@ class MusicPlayer {
             const guildData = client.getGuildData(queue.guild.id);
 
             const embed = new Embed(client, guildData)
-                .setDescription(`> Ajoute a la file: **[${track.title}](${track.url})** — \`${track.duration}\``)
+                .setDescription(`**[${track.title}](${track.url})** ajoutée · \`${track.duration}\``);
 
             if (track.requestedBy) {
                 embed.setFooter({ text: track.requestedBy.username, iconURL: track.requestedBy.displayAvatarURL() });
@@ -58,40 +57,54 @@ class MusicPlayer {
 
         player.events.on(GuildQueueEvent.AudioTracksAdd, (queue, tracks) => {
             const guildData = client.getGuildData(queue.guild.id);
-
             const embed = new Embed(client, guildData)
-                .setDescription(`> **${tracks.length}** tracks ajoutees a la file d'attente`);
-
+                .setDescription(`**${tracks.length}** pistes ajoutées à la file`);
             queue.metadata.channel.send({ embeds: [embed] }).catch(() => {});
         });
 
         player.events.on(GuildQueueEvent.PlayerSkip, (queue, track) => {
-            queue.metadata.channel.send({ content: `> Track \`${track.title}\` impossible a lire, passage a la suivante...` }).catch(() => {});
+            const guildData = client.getGuildData(queue.guild.id);
+            const embed = new Embed(client, guildData)
+                .setWarning()
+                .setDescription(`Impossible de lire **${track.title}**, passage à la suite`);
+            queue.metadata.channel.send({ embeds: [embed] }).catch(() => {});
         });
 
         player.events.on(GuildQueueEvent.EmptyQueue, (queue) => {
             const guildData = client.getGuildData(queue.guild.id);
             const embed = new Embed(client, guildData)
-                .setDescription('> La file d\'attente est terminee.');
+                .setDescription(`File d'attente terminée`);
             queue.metadata.channel.send({ embeds: [embed] }).catch(() => {});
         });
 
         player.events.on(GuildQueueEvent.EmptyChannel, (queue) => {
-            queue.metadata.channel.send({ content: '> Plus personne dans le salon vocal, deconnexion.' }).catch(() => {});
+            const guildData = client.getGuildData(queue.guild.id);
+            const embed = new Embed(client, guildData)
+                .setDescription(`Salon vide — déconnexion`);
+            queue.metadata.channel.send({ embeds: [embed] }).catch(() => {});
         });
 
         player.events.on(GuildQueueEvent.Disconnect, (queue) => {
-            queue.metadata.channel.send({ content: '> Deconnecte du salon vocal.' }).catch(() => {});
+            const guildData = client.getGuildData(queue.guild.id);
+            const embed = new Embed(client, guildData)
+                .setDescription(`Déconnecté du salon vocal`);
+            queue.metadata.channel.send({ embeds: [embed] }).catch(() => {});
         });
 
         player.events.on(GuildQueueEvent.Error, (queue, error) => {
             console.error('[MUSIC ERROR]', error);
-            queue.metadata.channel.send({ content: `> Une erreur est survenue: \`${error.message}\`` }).catch(() => {});
+            const guildData = client.getGuildData(queue.guild.id);
+            const embed = new Embed(client, guildData).setError()
+                .setDescription(`Erreur — \`${error.message}\``);
+            queue.metadata.channel.send({ embeds: [embed] }).catch(() => {});
         });
 
         player.events.on(GuildQueueEvent.PlayerError, (queue, error) => {
             console.error('[MUSIC PLAYER ERROR]', error);
-            queue.metadata.channel.send({ content: `> Erreur de lecture: \`${error.message}\`` }).catch(() => {});
+            const guildData = client.getGuildData(queue.guild.id);
+            const embed = new Embed(client, guildData).setError()
+                .setDescription(`Erreur de lecture — \`${error.message}\``);
+            queue.metadata.channel.send({ embeds: [embed] }).catch(() => {});
         });
     }
 }

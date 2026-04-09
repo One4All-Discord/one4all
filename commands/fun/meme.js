@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const randomPuppy = require('random-puppy')
 const Command = require('../../structures/Handler/Command');
@@ -25,11 +26,10 @@ module.exports = class Test extends Command{
 
     const img = await randomPuppy(random)
 
-    const embed = new EmbedBuilder()
-        .setColor(`${color}`)
+    const embed = new Embed(client, guildData)
         .setImage(img)
         .setTitle(lang.meme.reponse(random))
         .setURL(`https://reddit.com/r/${random}`)
 
-    message.channel.send({ embeds: [embed] })
+    message.reply({ embeds: [embed] })
 }};

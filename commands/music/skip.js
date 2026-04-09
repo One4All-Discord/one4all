@@ -17,19 +17,18 @@ module.exports = class Skip extends Command {
 
     async run(client, message, args) {
         const guildData = client.getGuildData(message.guild.id);
-        const lang = client.lang(guildData.lang);
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours.');
         }
 
-        const currentTitle = queue.currentTrack.title;
+        const title = queue.currentTrack.title;
         queue.node.skip();
 
         const embed = new Embed(client, guildData)
-            .setDescription(`**${currentTitle}** a été passée.`);
-
-        message.channel.send({ embeds: [embed] });
+            .setAuthor({ name: 'Piste passée', iconURL: client.user.displayAvatarURL() })
+            .setDescription(`**${title}**`);
+        message.reply({ embeds: [embed] });
     }
 };

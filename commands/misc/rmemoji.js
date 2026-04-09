@@ -23,15 +23,15 @@ module.exports = class Test extends Command{
     let custom = Util.parseEmoji(emoji);
 
     if (!emoji) {
-        return message.channel.send(lang.removeemoji.missingUrl);
+        return message.reply(lang.removeemoji.missingUrl);
     }
 
     if (custom.id) {
         message.guild.emojis.resolve(custom.id).delete(`Remove emoji par ${message.author.username}`).then(()=>{
-            message.channel.send(lang.removeemoji.success(custom.name))
+            message.reply(lang.removeemoji.success(custom.name))
 
         }).catch(err => {
-            message.channel.send(lang.removeemoji.error(custom.name))
+            message.reply(lang.removeemoji.error(custom.name))
         });
 
     }

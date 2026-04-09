@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const Command = require('../../structures/Handler/Command');
 module.exports = class Test extends Command{
@@ -28,16 +29,15 @@ module.exports = class Test extends Command{
         })
         if (!args[0]) {
             try {
-                let tdata = await message.channel.send(lang.loading)
+                let tdata = await message.reply(lang.loading)
 
                 let p0 = 0;
                 let p1 = 10;
                 let page = 1;
                 // console.log(tempName.map(r => r).map((user, i) => message.guild.members.cache.get(user).user.id, i))
 
-                let embed = new EmbedBuilder()
+                let embed = new Embed(client, guildData)
                 embed.setTitle(`${lang.serverlist.title}`)
-                    .setColor(`${color}`)
                     .setDescription(tempName
                         .slice(0, 10)
                         .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempName.length / 10)}**`)
@@ -116,14 +116,14 @@ module.exports = class Test extends Command{
             } catch (err) {
                 console.log(err)
             }
-            message.channel.send(lang.serverlist.leave)
+            message.reply(lang.serverlist.leave)
         }
         if (!isNaN(args[0])) {
-            if (!client.guilds.cache.has(args[0])) return message.channel.send(lang.serverlist.errorNotServer)
+            if (!client.guilds.cache.has(args[0])) return message.reply(lang.serverlist.errorNotServer)
 
             const guild = client.guilds.cache.get(args[0])
             guild.leave().then(() => {
-                message.channel.send(lang.serverlist.success(guild.name))
+                message.reply(lang.serverlist.success(guild.name))
             })
         }
     }

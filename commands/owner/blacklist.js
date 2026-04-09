@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const Command = require('../../structures/Handler/Command');
 module.exports = class Test extends Command {
@@ -33,10 +34,10 @@ module.exports = class Test extends Command {
         const list = args[0] === 'list';
         const on = args[0] === 'on';
         const off = args[0] === 'off';
-        if (!add && !remove && !list && !clear && !on && !off) return message.channel.send(lang.blacklist.errorSyntax)
+        if (!add && !remove && !list && !clear && !on && !off) return message.reply(lang.blacklist.errorSyntax)
 
         if (on) {
-            if (guildOwnerBlacklisted && guildOwnerBlacklisted.enable) return await message.channel.send(lang.blacklist.errorAlreadyOn)
+            if (guildOwnerBlacklisted && guildOwnerBlacklisted.enable) return await message.reply(lang.blacklist.errorAlreadyOn)
 
             if (!guildOwnerBlacklisted) {
                 await client.getUserData(guildOwner).initBlacklist(true).then(res => guildOwnerBlacklisted = res)
@@ -44,10 +45,10 @@ module.exports = class Test extends Command {
             guildOwnerBlacklisted.enable = true
             client.getUserData(guildOwner).updateBlacklist(guildOwnerBlacklisted)
             tempdata = client.getUserData(guildOwner).blacklist.blacklisted;
-            return message.channel.send(lang.blacklist.successEnable)
+            return message.reply(lang.blacklist.successEnable)
         }
         if (off) {
-            if (guildOwnerBlacklisted && !guildOwnerBlacklisted.enable) return await message.channel.send(lang.blacklist.errorAlreadyOff)
+            if (guildOwnerBlacklisted && !guildOwnerBlacklisted.enable) return await message.reply(lang.blacklist.errorAlreadyOff)
 
             if (!guildOwnerBlacklisted) {
                 await client.getUserData(guildOwner).initBlacklist(false).then(res => guildOwnerBlacklisted = res)
@@ -57,7 +58,7 @@ module.exports = class Test extends Command {
 
             client.getUserData(guildOwner).updateBlacklist(guildOwnerBlacklisted)
             tempdata = client.getUserData(guildOwner).blacklist.blacklisted;
-            return message.channel.send(lang.blacklist.successDisable)
+            return message.reply(lang.blacklist.successDisable)
 
         }
         if (add) {
@@ -69,19 +70,19 @@ module.exports = class Test extends Command {
                     })
                 }
             }
-            if (!memberUser) return message.channel.send(lang.blacklist.errorCantFindMember)
+            if (!memberUser) return message.reply(lang.blacklist.errorCantFindMember)
             if (!args[1] && !message.mentions.members.first()) {
-                return message.channel.send(lang.blacklist.errorSyntaxAdd)
+                return message.reply(lang.blacklist.errorSyntaxAdd)
             }
 
-            if (client.isOwner(memberUser.id)) return message.channel.send(lang.blacklist.errorBotOwner)
-            if (memberUser.id === owner) return message.channel.send(lang.blacklist.errorCrown)
-            if (memberUser.id === client.user.id) return message.channel.send(lang.blacklist.errorMe)
-            if (!memberUser) return message.channel.send(lang.blacklist.errorSyntaxAdd)
+            if (client.isOwner(memberUser.id)) return message.reply(lang.blacklist.errorBotOwner)
+            if (memberUser.id === owner) return message.reply(lang.blacklist.errorCrown)
+            if (memberUser.id === client.user.id) return message.reply(lang.blacklist.errorMe)
+            if (!memberUser) return message.reply(lang.blacklist.errorSyntaxAdd)
             let isTargetOwner = client.isOwner(message.guild.id, memberUser.id)
-            if (isTargetOwner && message.author.id !== owner) return message.channel.send(lang.blacklist.errorTryBlOwner(memberUser))
-            if (!tempdata) return message.channel.send(lang.blacklist.errorNotInDb(guildData.prefix))
-            if (tempdata.includes(memberUser.id)) return message.channel.send(lang.blacklist.errorAlreadyBl(memberUser))
+            if (isTargetOwner && message.author.id !== owner) return message.reply(lang.blacklist.errorTryBlOwner(memberUser))
+            if (!tempdata) return message.reply(lang.blacklist.errorNotInDb(guildData.prefix))
+            if (tempdata.includes(memberUser.id)) return message.reply(lang.blacklist.errorAlreadyBl(memberUser))
             while (tempdata[0] === '') {
                 await tempdata.shift()
             }
@@ -94,10 +95,10 @@ module.exports = class Test extends Command {
                 blacklisted: tempdata
             }
             client.getUserData(guildOwner).updateBlacklist(visualitor).then(() => {
-                message.channel.send(lang.blacklist.successBl(memberUser)).then(() => {
+                message.reply(lang.blacklist.successBl(memberUser)).then(() => {
                     message.guild.members.ban(memberUser.id, {reason: `Blacklist par ${message.author.username}`,})
                         .then(() => {
-                            message.channel.send(lang.blacklist.successBanBl(memberUser)).then(async () => {
+                            message.reply(lang.blacklist.successBanBl(memberUser)).then(async () => {
                                 try {
                                     if (client.botperso) {
                                         let guildCount = client.guilds.cache.filter(guild => guild.ownerId === owner && guild.id !== message.guild.id).size;
@@ -105,7 +106,7 @@ module.exports = class Test extends Command {
                                             guild.members.ban(memberUser.id, {reason: `Blacklist par ${message.author.username}`,})
 
                                         })
-                                        await message.channel.send(lang.blacklist.successBanGuild(guildCount))
+                                        await message.reply(lang.blacklist.successBanGuild(guildCount))
 
                                     } else if (client.shard) {
                                         const guildCount = await client.shard.broadcastEval(`this.guilds.cache.filter(guild => guild.ownerId === '${owner}' && guild.id !== '${message.guild.id}').size`).then(async (res) => res.reduce((acc, guildCount) => acc + guildCount), 0)
@@ -119,7 +120,7 @@ module.exports = class Test extends Command {
                                             })
                                         })();
                                     `).then(async (res) => {
-                                            await message.channel.send(lang.blacklist.successBanGuild(guildCount))
+                                            await message.reply(lang.blacklist.successBanGuild(guildCount))
                                         })
                                     }
 
@@ -141,19 +142,19 @@ module.exports = class Test extends Command {
                     })
                 }
             }
-            if (!memberUser) return message.channel.send(lang.blacklist.errorCantFindMember)
+            if (!memberUser) return message.reply(lang.blacklist.errorCantFindMember)
             if (!args[1] && !message.mentions.members.first()) {
-                return message.channel.send(lang.blacklist.errorSyntaxAdd)
+                return message.reply(lang.blacklist.errorSyntaxAdd)
             }
 
-            if (memberUser.id === owner && memberUser === message.guild.ownerId) return message.channel.send(lang.blacklist.errorCrown)
-            if (memberUser.id === client.user.id) return message.channel.send(lang.blacklist.errorMe)
-            if (!memberUser) return message.channel.send(lang.blacklist.errorSyntaxAdd)
+            if (memberUser.id === owner && memberUser === message.guild.ownerId) return message.reply(lang.blacklist.errorCrown)
+            if (memberUser.id === client.user.id) return message.reply(lang.blacklist.errorMe)
+            if (!memberUser) return message.reply(lang.blacklist.errorSyntaxAdd)
             let isTargetOwner = client.isOwner(message.guild.id, memberUser.id)
-            if (isTargetOwner && message.author.id !== owner) return message.channel.send(lang.blacklist.errorTryUnBlOwner(memberUser))
-            if (!tempdata) return message.channel.send(lang.blacklist.errorNotInDb(guildData.prefix))
+            if (isTargetOwner && message.author.id !== owner) return message.reply(lang.blacklist.errorTryUnBlOwner(memberUser))
+            if (!tempdata) return message.reply(lang.blacklist.errorNotInDb(guildData.prefix))
 
-            if (!tempdata.includes(memberUser.id)) return message.channel.send(lang.blacklist.errorNotBl(memberUser))
+            if (!tempdata.includes(memberUser.id)) return message.reply(lang.blacklist.errorNotBl(memberUser))
 
             tempdata = tempdata.filter(x => x !== memberUser.id)
 
@@ -163,10 +164,10 @@ module.exports = class Test extends Command {
             }
             client.getUserData(guildOwner).updateBlacklist(visualitor).then(() => {
 
-                message.channel.send(lang.blacklist.successRmBl(memberUser)).then(() => {
+                message.reply(lang.blacklist.successRmBl(memberUser)).then(() => {
                     message.guild.members.unban(memberUser.id, `UnBlacklist par ${message.author.username}`)
                         .then(() => {
-                            message.channel.send(lang.blacklist.successUnBanBl(memberUser)).then(async () => {
+                            message.reply(lang.blacklist.successUnBanBl(memberUser)).then(async () => {
                                 try {
                                     if (client.botperso) {
                                         let guildCount = client.guilds.cache.filter(guild => guild.ownerId === owner && guild.id !== message.guild.id).size;
@@ -174,7 +175,7 @@ module.exports = class Test extends Command {
                                             guild.members.unban(memberUser.id, {reason: `UnBlacklist par ${message.author.username}`,})
 
                                         })
-                                        await message.channel.send(lang.blacklist.successUnBanGuild(guildCount))
+                                        await message.reply(lang.blacklist.successUnBanGuild(guildCount))
 
                                     } else if (client.shard) {
                                         const guildCount = await client.shard.broadcastEval(`this.guilds.cache.filter(guild => guild.ownerId === '${owner}' && guild.id !== '${message.guild.id}').size`).then(async (res) => res.reduce((acc, guildCount) => acc + guildCount), 0)
@@ -188,7 +189,7 @@ module.exports = class Test extends Command {
                                             })
                                         })();
                                     `).then(async (res) => {
-                                            await message.channel.send(lang.blacklist.successUnBanGuild(guildCount))
+                                            await message.reply(lang.blacklist.successUnBanGuild(guildCount))
 
                                         })
                                     }
@@ -203,9 +204,9 @@ module.exports = class Test extends Command {
 
             })
         } else if (list) {
-            if (!tempdata) return message.channel.send(lang.blacklist.errorNotInDb(guildData.prefix))
+            if (!tempdata) return message.reply(lang.blacklist.errorNotInDb(guildData.prefix))
             try {
-                let tdata = await message.channel.send(lang.loading)
+                let tdata = await message.reply(lang.loading)
 
                 let p0 = 0;
                 let p1 = 10;
@@ -241,14 +242,12 @@ module.exports = class Test extends Command {
                     }
 
                 }
-                let embed = new EmbedBuilder()
+                let embed = new Embed(client, guildData)
                 embed.setTitle(lang.blacklist.titleList)
-                    .setColor(`${color}`)
                 embed.setDescription(tempMember
                     .map((user, i) => `${i + 1} ・ **${user.username}** \`${user.id}\``)
                     .slice(0, 10)
                     .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempdata.length / 10)}**`)
-                    .setTimestamp()
                     .setFooter({ text: `${client.user.username}` });
 
                 let reac1
@@ -324,13 +323,11 @@ module.exports = class Test extends Command {
                 console.log(err)
             }
         } else if (clear) {
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setTitle(`Confirmation`)
                 .setDescription(lang.blacklist.clearBl)
                 .setFooter({ text: client.user.username })
-                .setTimestamp()
-                .setColor(`${color}`)
-            const msg = await message.channel.send({ embeds: [embed] })
+            const msg = await message.reply({ embeds: [embed] })
             await msg.react('✅')
             await msg.react('❌')
 
@@ -348,14 +345,14 @@ module.exports = class Test extends Command {
                         client.getUserData(guildOwner).blacklist.blacklisted = tempdata;
                         client.getUserData(guildOwner).updateBlacklist(client.getUserData(guildOwner).blacklist)
                         msg.delete()
-                        return message.channel.send(lang.blacklist.successClearBl)
+                        return message.reply(lang.blacklist.successClearBl)
 
                     } catch (err) {
                         console.error(err)
-                        return message.channel.send(lang.blacklist.errror)
+                        return message.reply(lang.blacklist.errror)
                     }
                 } else if (r.emoji.name === '❌') {
-                    return message.channel.send(lang.blacklist.cancel)
+                    return message.reply(lang.blacklist.cancel)
                 }
             })
 

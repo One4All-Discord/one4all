@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const prettyMilliseconds = require('pretty-ms');
 
@@ -46,31 +47,29 @@ module.exports = class Test extends Command {
             if (result.message) {
                 const avatar = message.author.displayAvatarURL()
 
-                const embed = new EmbedBuilder()
+                const embed = new Embed(client, guildData)
                     .setTimestamp()
                     .setDescription(`
                     Vous n'avez pas de bot personnalisé
                 `)
-                    .setColor(`${color}`)
                     .setFooter({ text: message.author.username, iconURL: avatar })
 
-                return message.channel.send({ embeds: [embed] })
+                return message.reply({ embeds: [embed] })
             } else {
 
                 let now = Date.now();
                 now = new Date(now)
                 const expireAt = new Date(result.client.expireAt)
                 const timeLeft = prettyMilliseconds(expireAt.getTime() - now.getTime())
-                const msg = await message.channel.send(lang.loading)
+                const msg = await message.reply(lang.loading)
                 const avatar = message.author.displayAvatarURL()
                 const inv = `https://discord.com/oauth2/authorize?client_id=${result.client.botId}&scope=bot&permissions=8`
-                const embed = new EmbedBuilder()
+                const embed = new Embed(client, guildData)
 
                     .setDescription(`
                     [Invitation](${inv}) ・ **${timeLeft}**
                 `)
                     .setTimestamp()
-                    .setColor(`${color}`)
                     .setFooter({ text: message.author.username, iconURL: avatar })
                 msg.edit({ embeds: [embed] })
 

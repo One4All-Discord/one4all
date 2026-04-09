@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const Command = require('../../structures/Handler/Command');
 module.exports = class Test extends Command {
@@ -20,16 +21,14 @@ module.exports = class Test extends Command {
 
         const color = guildData.color
         const lang = client.lang(guildData.lang)
-        const msg = await message.channel.send(lang.loading)
+        const msg = await message.reply(lang.loading)
 
         await msg.react(`🇫🇷`);
         await msg.react("🇬🇧");
         await msg.react("❌");
-        const embed = new EmbedBuilder()
+        const embed = new Embed(client, guildData)
             .setTitle(lang.setlang.title)
             .setDescription(lang.setlang.description(guildData.lang))
-            .setTimestamp()
-            .setColor(`${color}`)
             .setFooter({ text: `${client.user.username}` });
         const filter = (reaction, user) => ['🇫🇷', '🇬🇧', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
             dureefiltrer = response => {
@@ -41,22 +40,22 @@ module.exports = class Test extends Command {
                 await r.users.remove(message.author);
                 if (r.emoji.name === "🇫🇷") {
                     if (guildData.lang === "fr") {
-                        return message.channel.send(lang.setlang.errorSelected)
+                        return message.reply(lang.setlang.errorSelected)
                     } else {
                         await collector.stop()
                         await msg.delete();
                         guildData.updateLang = 'fr';
-                        return message.channel.send(lang.setlang.success('fr'))
+                        return message.reply(lang.setlang.success('fr'))
                     }
 
                 } else if (r.emoji.name === "🇬🇧") {
                     if (guildData.lang === "en") {
-                        return message.channel.send(lang.setlang.errorSelected)
+                        return message.reply(lang.setlang.errorSelected)
                     } else {
                         await collector.stop()
                         await msg.delete();
                         guildData.updateLang = 'en';
-                        return message.channel.send(lang.setlang.success('en'))
+                        return message.reply(lang.setlang.success('en'))
                     }
                 } else if (r.emoji.name === "❌") {
                     await collector.stop();

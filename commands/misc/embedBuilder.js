@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 const title = new Map();
@@ -39,8 +40,8 @@ module.exports = class Test extends Command {
         const lang = client.lang(guildData.lang)
         const embed = new EmbedBuilder()
             .setDescription('\u200b')
-        const editEmbed = await message.channel.send({ embeds: [embed] })
-        const msg = await message.channel.send(lang.embedBuilder.loading)
+        const editEmbed = await message.reply({ embeds: [embed] })
+        const msg = await message.reply(lang.embedBuilder.loading)
         await msg.react('✏')
         await msg.react('📝')
         await msg.react('🗣')
@@ -80,7 +81,7 @@ module.exports = class Test extends Command {
             collector.on('collect', async r => {
                 r.users.remove(message.author);
                 if (r.emoji.name == '✏') {
-                    await message.channel.send(lang.embedBuilder.titleMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.titleMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msg = cld.first();
@@ -93,7 +94,7 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name == '📝') {
-                    await message.channel.send(lang.embedBuilder.descriptionMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.descriptionMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msg = cld.first();
@@ -105,7 +106,7 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name == '🗣') {
-                    await message.channel.send(lang.embedBuilder.authorMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.authorMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msg = cld.first();
@@ -117,7 +118,7 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name == '🖍') {
-                    await message.channel.send(lang.embedBuilder.footerMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.footerMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msg = cld.first();
@@ -129,7 +130,7 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name == '💶') {
-                    await message.channel.send(lang.embedBuilder.thumbnailMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.thumbnailMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let link;
@@ -195,7 +196,7 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name == '🖼') {
-                    await message.channel.send(lang.embedBuilder.imageMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.imageMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let link;
@@ -263,11 +264,11 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name == '🌐') {
-                    await message.channel.send(lang.embedBuilder.urlMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.urlMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msg = cld.first()
-                                if (!msg.content.toLowerCase().startsWith('http') || !msg.content.toLowerCase().startsWith('https')) return message.channel.send(lang.embedBuilder.errorUrl)
+                                if (!msg.content.toLowerCase().startsWith('http') || !msg.content.toLowerCase().startsWith('https')) return message.reply(lang.embedBuilder.errorUrl)
                                 await url.set(message.guild.id, msg.content)
                                 mp.delete()
                                 updateEmbed()
@@ -276,7 +277,7 @@ module.exports = class Test extends Command {
                             });
                     })
                 } else if (r.emoji.name == '🎨') {
-                    await message.channel.send(lang.embedBuilder.colorMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.colorMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msg = cld.first();
@@ -349,14 +350,14 @@ module.exports = class Test extends Command {
                                 } else {
                                     msg.delete()
                                     mp.delete()
-                                    message.channel.send(lang.embedBuilder.errorColor)
+                                    message.reply(lang.embedBuilder.errorColor)
                                 }
 
 
                             });
                     })
                 } else if (r.emoji.name == '⏲') {
-                    await message.channel.send(lang.embedBuilder.timestampMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.timestampMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msg = cld.first();
@@ -373,7 +374,7 @@ module.exports = class Test extends Command {
                                 } else if (msg.content.toLowerCase() != 'non' && msg.content.toLowerCase() != 'oui') {
                                     msg.delete()
                                     mp.delete()
-                                    message.channel.send(lang.error.YesNo)
+                                    message.reply(lang.error.YesNo)
                                 }
 
 
@@ -382,11 +383,11 @@ module.exports = class Test extends Command {
                 } else if (r.emoji.name == '©') {
                     let ch;
                     let embedMsg;
-                    await message.channel.send(lang.embedBuilder.copyMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.copyMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msg = cld.first();
-                                // if(isNaN(msg)) return message.channel.send(`Veuilez entrer un id valide !`).then(() =>{
+                                // if(isNaN(msg)) return message.reply(`Veuilez entrer un id valide !`).then(() =>{
                                 //     msg.delete()
                                 // })
                                 // embedMsg = message.guild.channels
@@ -396,16 +397,16 @@ module.exports = class Test extends Command {
                                     await msg.delete();
                                 } catch (err) {
                                     console.log(err)
-                                    return await message.channel.send(lang.embedBuilder.errorChannel).then(async () => {
+                                    return await message.reply(lang.embedBuilder.errorChannel).then(async () => {
                                         await mp.delete()
                                         await msg.delete();
                                     })
                                 }
-                                await message.channel.send(lang.embedBuilder.messageId).then(id => {
+                                await message.reply(lang.embedBuilder.messageId).then(id => {
                                     id.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                                         .then(async cld => {
                                             let msg = cld.first();
-                                            if (isNaN(msg)) return message.channel.send(lang.embedBuilder.errorWrongId).then(() => {
+                                            if (isNaN(msg)) return message.reply(lang.embedBuilder.errorWrongId).then(() => {
                                                 mp.delete();
                                                 msg.delete()
                                             })
@@ -426,7 +427,7 @@ module.exports = class Test extends Command {
                                                 updateEmbed()
 
                                             } catch (err) {
-                                                return await message.channel.send(lang.embedBuilder.errorMessage(ch)).then(async () => {
+                                                return await message.reply(lang.embedBuilder.errorMessage(ch)).then(async () => {
                                                     await mp.delete()
                                                     await msg.delete();
                                                 })
@@ -439,7 +440,7 @@ module.exports = class Test extends Command {
                     })
 
                 } else if (r.emoji.name == '❌') {
-                    await message.channel.send(lang.embedBuilder.cancelMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.cancelMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msG = cld.first();
@@ -466,14 +467,14 @@ module.exports = class Test extends Command {
                                 } else if (msG.content.toLowerCase() != 'non' && msG.content.toLowerCase() != 'oui') {
                                     msG.delete()
                                     mp.delete()
-                                    message.channel.send(lang.error.YesNo)
+                                    message.reply(lang.error.YesNo)
                                 }
 
 
                             });
                     })
                 } else if (r.emoji.name == '✅') {
-                    await message.channel.send(lang.embedBuilder.sendMsg).then(mp => {
+                    await message.reply(lang.embedBuilder.sendMsg).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 60000})
                             .then(async cld => {
                                 let msgs = cld.first();
@@ -530,7 +531,7 @@ module.exports = class Test extends Command {
             })
             collector.on('end', async (collected, reason) => {
                 if (reason == 'time') {
-                    message.channel.send(lang.error.timeout)
+                    message.reply(lang.error.timeout)
                 }
                 title.delete(message.guild.id);
                 description.delete(message.guild.id);

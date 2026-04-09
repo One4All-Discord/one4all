@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
 const StateManager = require('../../utils/StateManager');
 const categoryNameMapping = new Map();
@@ -23,7 +24,7 @@ module.exports = class Test extends Command {
 
         const color = guildData.color
         const lang = client.lang(guildData.lang)
-        const msg = await message.channel.send(lang.loading);
+        const msg = await message.reply(lang.loading);
         const emojis = ['🕳', '💬', '💨', '💥', '❌', '✅']
         for (const emoji of emojis) {
             await msg.react(emoji)
@@ -33,11 +34,9 @@ module.exports = class Test extends Command {
         enable.set(message.guild.id, !tempVoc.isOn ? 'Désactivé' : 'Activé')
 
 
-        const embed = new EmbedBuilder()
+        const embed = new Embed(client, guildData)
             .setTitle(lang.tempvoc.embedTitle)
             .setDescription(lang.tempvoc.embedDescription(categoryNameMapping.get(message.guild.id).chName, enable.get(message.guild.id)))
-            .setColor(`${color}`)
-            .setTimestamp()
             .setFooter({ text: client.user.username });
 
         const filter = (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
@@ -49,7 +48,7 @@ module.exports = class Test extends Command {
             collector.on('collect', async r => {
                 await r.users.remove(message.author);
                 if (r.emoji.name === emojis[0]) {
-                    message.channel.send(lang.tempvoc.loadingCreation).then((loading) => {
+                    message.reply(lang.tempvoc.loadingCreation).then((loading) => {
                         message.guild.channels.create(lang.tempvoc.autoCat, {
                             type: ChannelType.GuildCategory,
                             permissionsOverwrites: [{
@@ -92,18 +91,18 @@ module.exports = class Test extends Command {
                     })
                 }
                 if (r.emoji.name === emojis[1]) {
-                    await message.channel.send(lang.tempvoc.nameQ).then(mp => {
+                    await message.reply(lang.tempvoc.nameQ).then(mp => {
                         mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 50000})
                             .then(async cld => {
                                 let msg = cld.first();
                                 if (msg.content.toLowerCase() === "cancel") {
-                                    const reply = await message.channel.send(lang.cancel)
+                                    const reply = await message.reply(lang.cancel)
                                     await setTimeout(() => reply.delete().catch(() => {}), 2000)
                                     await setTimeout(() => msg.delete().catch(() => {}), 2000)
                                     return await setTimeout(() => mp.delete().catch(() => {}), 2000)
                                 }
                                 if (!msg.content.includes('{username}') && msg.content.toLowerCase() !== 'cancel') {
-                                    return await message.channel.send(lang.tempvoc.errorNoUsername).then(async (replyMSG) => {
+                                    return await message.reply(lang.tempvoc.errorNoUsername).then(async (replyMSG) => {
                                         setTimeout(async () => {
                                             await msg.delete();
                                             await mp.delete();
@@ -138,7 +137,7 @@ module.exports = class Test extends Command {
                 }
                 if (r.emoji.name === emojis[3]) {
                     await guildData.newTempvoc(null, false).then(async () => {
-                        await message.channel.send(lang.reactionRole.successDel).then(async (replyMSG) => {
+                        await message.reply(lang.reactionRole.successDel).then(async (replyMSG) => {
                             setTimeout(async () => {
                                 await replyMSG.delete();
                                 return await msg.delete()
@@ -148,7 +147,7 @@ module.exports = class Test extends Command {
 
                 }
                 if (r.emoji.name === emojis[4]) {
-                    message.channel.send(lang.tempvoc.cancel).then((mp) => {
+                    message.reply(lang.tempvoc.cancel).then((mp) => {
                         enable.delete(message.guild.id);
                         categoryNameMapping.delete(message.guild.id);
                         collector.stop('user_stop');
@@ -162,7 +161,7 @@ module.exports = class Test extends Command {
                 if (r.emoji.name === emojis[5]) {
                     const info = categoryNameMapping.get(message.guild.id)
                     if (info.catId === 'Non définie') {
-                        return await message.channel.send(lang.tempvoc.noCat).then(async (replyMSG) => {
+                        return await message.reply(lang.tempvoc.noCat).then(async (replyMSG) => {
                             setTimeout(async () => {
                                 return await replyMSG.delete();
                             }, 2000)
@@ -178,7 +177,7 @@ module.exports = class Test extends Command {
                         isOn: isOn
                     })
                     await guildData.newTempvoc(categoryNameMapping.get(message.guild.id), true)
-                    return message.channel.send(lang.tempvoc.success).then(async (replyMSG) => {
+                    return message.reply(lang.tempvoc.success).then(async (replyMSG) => {
                         setTimeout(async () => {
                             await msg.delete();
                             return await replyMSG.delete();
@@ -195,7 +194,7 @@ module.exports = class Test extends Command {
             })
             collector.on('end', async (collected, reason) => {
                 if (reason === 'time') {
-                    const replyMsg = await message.channel.send(lang.error.timeout)
+                    const replyMsg = await message.reply(lang.error.timeout)
                     enable.delete(message.guild.id);
                     categoryNameMapping.delete(message.guild.id);
 

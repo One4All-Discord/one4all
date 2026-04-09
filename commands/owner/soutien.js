@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const soutienId = new Map();
 const soutienMsg = new Map();
@@ -20,7 +21,6 @@ module.exports = class Test extends Command {
 
     async run(client, message, args) {
         const guildData = client.getGuildData(message.guild.id);
-        if (!client.botperso) return;
         const lang = client.lang(guildData.lang)
 
         const color = guildData.color
@@ -31,17 +31,14 @@ module.exports = class Test extends Command {
 
         soutienMsg.set(message.guild.id, guildData.config.soutienMsg);
         if (!args[0]) {
-            const embed = new EmbedBuilder()
-                .setAuthor({ name: `Informations Soutien`, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-                .setColor(`${color}`)
-                .setTimestamp()
-                .setThumbnail(`https://images-ext-1.discordapp.net/external/io8pRqFGLz1MelORzIv2tAiPB3uulaHCX_QH7XEK0y4/%3Fwidth%3D588%26height%3D588/https/media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg`)
-                .setFooter({ text: "Informations Soutien", iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-                .addFields({ name: '🆘 Soutien:', value: `[\`soutien config\`](https://discord.gg/h69YZHB7Nh) ・ Configuration du système de soutien\n[\`soutien count\`](https://discord.gg/h69YZHB7Nh) ・ Montrez combien de membres vous soutiennent` })
-            message.channel.send({ embeds: [embed] })
+            const embed = new Embed(client, guildData)
+                .setAuthor({ name: `Informations Soutien`, iconURL: client.user.displayAvatarURL() })
+                .setFooter({ text: "Informations Soutien", iconURL: client.user.displayAvatarURL() })
+                .addFields({ name: '🆘 Soutien:', value: `[\`soutien config\`](https://discord.gg/TfwGcCjyfp) ・ Configuration du système de soutien\n[\`soutien count\`](https://discord.gg/TfwGcCjyfp) ・ Montrez combien de membres vous soutiennent` })
+            message.reply({ embeds: [embed] })
         }
         if (config) {
-            const msg = await message.channel.send(lang.loading)
+            const msg = await message.reply(lang.loading)
 
             await msg.react("1️⃣");
             await msg.react("2️⃣");
@@ -57,18 +54,16 @@ module.exports = class Test extends Command {
                 isOnS = '▫️'
             }
 
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setTitle(lang.soutien.title)
                 .setDescription(lang.soutien.description(soutienId, soutienMsg, isOnS, message.guild))
-                .setTimestamp()
-                .setColor(`${color}`)
                 .setFooter({ text: client.user.username });
             msg.edit({ embeds: [embed] })
             const data_res = msg.createReactionCollector({ filter: (reaction, user) => user.id === message.author.id, time: 120000 });
             data_res.on("collect", async (reaction) => {
                 await reaction.users.remove(message.author);
                 if (reaction.emoji.name === "1️⃣") {
-                    let question = await message.channel.send(lang.soutien.roleQ)
+                    let question = await message.reply(lang.soutien.roleQ)
                     const filter = m => message.author.id === m.author.id;
                     message.channel.awaitMessages({ filter: filter, 
                         max: 1,
@@ -78,12 +73,12 @@ module.exports = class Test extends Command {
                         await collected.first().delete()
                         question.delete()
                         if (collected.first().content.toLowerCase() === "cancel") {
-                            return message.channel.send(lang.cancel);
+                            return message.reply(lang.cancel);
                         }
                         const response = collected.first().mentions.roles.first();
                         const channelId = response.id;
 
-                        message.channel.send(lang.soutien.success(response))
+                        message.reply(lang.soutien.success(response))
                         soutienId.set(message.guild.id, channelId)
                         updateEmbed()
 
@@ -93,7 +88,7 @@ module.exports = class Test extends Command {
                     })
                 } else if (reaction.emoji.name === "2️⃣") {
 
-                    let question = await message.channel.send(lang.soutien.msgQ)
+                    let question = await message.reply(lang.soutien.msgQ)
                     const filter = m => message.author.id === m.author.id;
                     message.channel.awaitMessages({ filter: filter, 
                         max: 1,
@@ -102,15 +97,15 @@ module.exports = class Test extends Command {
 
                         await collected.first().delete()
                         if (collected.first().content.toLowerCase() === "cancel") {
-                            return message.channel.send(lang.cancel);
+                            return message.reply(lang.cancel);
                         }
                         let response = collected.first().content;
 
                         updateEmbed()
-                        message.channel.send(lang.soutien.successEditRl);
-                        message.channel.send(`${response}`);
+                        message.reply(lang.soutien.successEditRl);
+                        message.reply(`${response}`);
                         soutienMsg.set(message.guild.id, response)
-                        let question = await message.channel.send(lang.soutien.rmAllRlQ)
+                        let question = await message.reply(lang.soutien.rmAllRlQ)
                         const filter = m => message.author.id === m.author.id;
                         message.channel.awaitMessages({ filter: filter, 
                             max: 1,
@@ -122,7 +117,7 @@ module.exports = class Test extends Command {
                             const response = collected.first().content.toLowerCase();
                             const rlId = soutienId.get(message.guild.id)
                             if (collected.first().content.toLowerCase() === "cancel") {
-                                return message.channel.send(lang.cancel);
+                                return message.reply(lang.cancel);
                             } else if (response === lang.yes) {
                                 try {
                                     const Role = message.guild.roles.cache.get(rlId);
@@ -133,26 +128,26 @@ module.exports = class Test extends Command {
                                     });
                                 } catch (err) {
                                     console.log(err)
-                                    return message.channel.send(lang.soutien.errorRmAllRl(rlId))
+                                    return message.reply(lang.soutien.errorRmAllRl(rlId))
                                 }
                             } else if (response === lang.no) {
-                                return message.channel.send(lang.soutien.successNo)
+                                return message.reply(lang.soutien.successNo)
                             } else if (collected.first().content.toLowerCase() !== lang.no || collected.first().content.toLowerCase() !== lang.yes) {
-                                return message.channel.send(lang.error.NoYes)
+                                return message.reply(lang.error.NoYes)
                             }
-                            message.channel.send(lang.soutien.removingRl(rlId))
+                            message.reply(lang.soutien.removingRl(rlId))
                         }).catch((error) => {
                             console.log(error)
                             message.reply(lang.soutien.errorTimeOut2M)
                         })
                     }).catch((error) => {
                         console.log(error)
-                        message.channel.send(lang.soutien.errorChMsg);
-                        return message.channel.send(`${response}`);
+                        message.reply(lang.soutien.errorChMsg);
+                        return message.reply(`${response}`);
                     })
 
                 } else if (reaction.emoji.name === "3️⃣") {
-                    let question = await message.channel.send(lang.soutien.enableQ)
+                    let question = await message.reply(lang.soutien.enableQ)
                     const filter = m => message.author.id === m.author.id;
                     message.channel.awaitMessages({ filter: filter, 
                         max: 1,
@@ -161,19 +156,19 @@ module.exports = class Test extends Command {
                         await collected.first().delete()
                         question.delete()
                         if (collected.first().content.toLowerCase() === "cancel") {
-                            return message.channel.send(lang.cancel);
+                            return message.reply(lang.cancel);
                         } else if (collected.first().content.toLowerCase() === lang.yes) {
 
-                            message.channel.send(lang.soutien.successEnable);
+                            message.reply(lang.soutien.successEnable);
                             soutienOn.set(message.guild.id, true)
                             updateEmbed()
                         } else if (collected.first().content.toLowerCase() === lang.no) {
 
-                            message.channel.send(lang.soutien.successDisable);
+                            message.reply(lang.soutien.successDisable);
                             soutienOn.set(message.guild.id, false)
 
                         } else if (collected.first().content.toLowerCase() !== lang.no || collected.first().content.toLowerCase() !== lang.yes) {
-                            return message.channel.send(lang.error.NoYes)
+                            return message.reply(lang.error.NoYes)
                         }
                         updateEmbed()
                     }).catch((error) => {
@@ -190,7 +185,7 @@ module.exports = class Test extends Command {
 
             });
             data_res.on('end', collected => {
-                message.channel.send(lang.cancel)
+                message.reply(lang.cancel)
             });
 
             function updateEmbed() {
@@ -201,13 +196,11 @@ module.exports = class Test extends Command {
             const rlId = soutienId.get(message.guild.id);
             const Role = message.guild.roles.cache.get(rlId);
             const count = Role.members.size;
-            let Embed = new EmbedBuilder()
+            let Embed = new Embed(client, guildData)
                 .setTitle("🆘 __Soutient__")
                 .setDescription(lang.soutien.descriptionCount(count))
-                .setColor(`${color}`)
-                .setFooter({ text: `${client.user.username}`, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-                .setTimestamp()
-            message.channel.send({ embeds: [Embed] })
+                .setFooter({ text: `${client.user.username}`, iconURL: client.user.displayAvatarURL() })
+            message.reply({ embeds: [Embed] })
 
         }
     }

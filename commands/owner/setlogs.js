@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder } = require('discord.js');
 const Command = require('../../structures/Handler/Command');
 module.exports = class Test extends Command {
@@ -35,16 +36,14 @@ module.exports = class Test extends Command {
             dureefiltrer = response => {
                 return response.author.id === message.author.id
             };
-        const setlogsMsg = await message.channel.send(lang.loading)
+        const setlogsMsg = await message.reply(lang.loading)
         const reaction = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '❌', '✅']
         for (let reac of reaction) {
             await setlogsMsg.react(reac)
         }
-        const logsEmbed = new EmbedBuilder()
+        const logsEmbed = new Embed(client, guildData)
             .setTitle(lang.setlogs.embedTitle)
             .setDescription(lang.setlogs.embedDescription(raidLog.get(message.guild.id), modLog.get(message.guild.id), voiceLog.get(message.guild.id), msgLog.get(message.guild.id)))
-            .setTimestamp()
-            .setColor(`${color}`)
             .setFooter({ text: client.user.username })
         setlogsMsg.edit({ embeds: [logsEmbed] })
             .then(async m => {
@@ -52,15 +51,15 @@ module.exports = class Test extends Command {
                 collector.on('collect', async r => {
                     await r.users.remove(message.author);
                     if (r.emoji.name === '1️⃣') {
-                        message.channel.send(lang.setlogs.raidChQ).then(mp => {
+                        message.reply(lang.setlogs.raidChQ).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(async cld => {
                                     let msg = cld.first();
                                     if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                        return message.channel.send(lang.setlogs.errorNotChannel)
+                                        return message.reply(lang.setlogs.errorNotChannel)
                                     }
                                     if (msg.content === 'off') {
-                                        await message.channel.send(lang.setlogs.disable("raid")).then((e) => {
+                                        await message.reply(lang.setlogs.disable("raid")).then((e) => {
                                             raidLog.set(message.guild.id, 'Non définie');
                                             updateEmbed()
 
@@ -80,7 +79,7 @@ module.exports = class Test extends Command {
                                     } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                     if (msg.content !== "off") {
 
-                                        const replyMsg = message.channel.send(lang.setlogs.successRaidCh(ch)).then((replyMSG) => {
+                                        const replyMsg = message.reply(lang.setlogs.successRaidCh(ch)).then((replyMSG) => {
                                             updateEmbed()
                                             setTimeout(async () => {
                                                 await replyMSG.delete();
@@ -95,15 +94,15 @@ module.exports = class Test extends Command {
                                 });
                         })
                     } else if (r.emoji.name === '2️⃣') {
-                        message.channel.send(lang.setlogs.modChQ).then(mp => {
+                        message.reply(lang.setlogs.modChQ).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(async cld => {
                                     let msg = cld.first();
                                     if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                        return message.channel.send(lang.setlogs.errorNotChannel)
+                                        return message.reply(lang.setlogs.errorNotChannel)
                                     }
                                     if (msg.content === 'off') {
-                                        await message.channel.send(lang.setlogs.disable("modération")).then((e) => {
+                                        await message.reply(lang.setlogs.disable("modération")).then((e) => {
                                             modLog.set(message.guild.id, 'Non définie');
                                             updateEmbed()
 
@@ -123,7 +122,7 @@ module.exports = class Test extends Command {
                                     } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                     if (msg.content !== "off") {
 
-                                        const replyMsg = message.channel.send(lang.setlogs.successModCh(ch)).then((replyMSG) => {
+                                        const replyMsg = message.reply(lang.setlogs.successModCh(ch)).then((replyMSG) => {
                                             updateEmbed()
                                             setTimeout(async () => {
                                                 await replyMSG.delete();
@@ -139,15 +138,15 @@ module.exports = class Test extends Command {
                                 });
                         })
                     } else if (r.emoji.name === '3️⃣') {
-                        message.channel.send(lang.setlogs.vocChQ).then(mp => {
+                        message.reply(lang.setlogs.vocChQ).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(async cld => {
                                     let msg = cld.first();
                                     if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content != 'off') {
-                                        return message.channel.send(lang.setlogs.errorNotChannel)
+                                        return message.reply(lang.setlogs.errorNotChannel)
                                     }
                                     if (msg.content === 'off') {
-                                        await message.channel.send(lang.setlogs.disable("vocal")).then((e) => {
+                                        await message.reply(lang.setlogs.disable("vocal")).then((e) => {
                                             voiceLog.set(message.guild.id, 'Non définie');
                                             updateEmbed()
 
@@ -166,7 +165,7 @@ module.exports = class Test extends Command {
                                         }
                                     } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                     if (msg.content !== "off") {
-                                        const replyMsg = message.channel.send(lang.setlogs.successVocCh(ch)).then((replyMSG) => {
+                                        const replyMsg = message.reply(lang.setlogs.successVocCh(ch)).then((replyMSG) => {
                                             updateEmbed()
                                             setTimeout(async () => {
                                                 await replyMSG.delete();
@@ -181,15 +180,15 @@ module.exports = class Test extends Command {
                                 });
                         })
                     } else if (r.emoji.name === '4️⃣') {
-                        message.channel.send(lang.setlogs.msgChQ).then(mp => {
+                        message.reply(lang.setlogs.msgChQ).then(mp => {
                             mp.channel.awaitMessages({ filter: dureefiltrer, max: 1, time: 30000})
                                 .then(async cld => {
                                     let msg = cld.first();
                                     if (!msg.mentions.channels.first() && isNaN(msg.content) && msg.content !== 'off') {
-                                        return message.channel.send(lang.setlogs.errorNotChannel)
+                                        return message.reply(lang.setlogs.errorNotChannel)
                                     }
                                     if (msg.content === 'off') {
-                                        await message.channel.send(lang.setlogs.disable("messages")).then((e) => {
+                                        await message.reply(lang.setlogs.disable("messages")).then((e) => {
                                             msgLog.set(message.guild.id, 'Non définie');
                                             updateEmbed()
 
@@ -209,7 +208,7 @@ module.exports = class Test extends Command {
                                     } else if (msg.mentions.channels.first() && msg.content !== 'off') ch = msg.mentions.channels.first();
                                     if (msg.content !== "off") {
 
-                                        const replyMsg = message.channel.send(lang.setlogs.successMsgCh(ch)).then((replyMSG) => {
+                                        const replyMsg = message.reply(lang.setlogs.successMsgCh(ch)).then((replyMSG) => {
                                             updateEmbed()
                                             setTimeout(async () => {
                                                 await replyMSG.delete();
@@ -225,7 +224,7 @@ module.exports = class Test extends Command {
                         })
 
                     } else if (r.emoji.name === '❌') {
-                        message.channel.send(lang.setlogs.cancel).then((mp) => {
+                        message.reply(lang.setlogs.cancel).then((mp) => {
                             voiceLog.delete(message.guild.id);
                             msgLog.delete(message.guild.id);
                             raidLog.delete(message.guild.id);
@@ -238,7 +237,7 @@ module.exports = class Test extends Command {
 
                         })
                     } else if (r.emoji.name === '✅') {
-                        message.channel.send(lang.setlogs.save).then(async (mp) => {
+                        message.reply(lang.setlogs.save).then(async (mp) => {
                             await guildData.updateLogs(modLog.get(message.guild.id), msgLog.get(message.guild.id), voiceLog.get(message.guild.id),  raidLog.get(message.guild.id)).then(() =>{
                                 collector.stop();
                                 setTimeout(async () => {

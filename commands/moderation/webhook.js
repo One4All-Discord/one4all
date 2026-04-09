@@ -1,13 +1,14 @@
 const fetch = require('node-fetch');
 const Command = require('../../structures/Handler/Command');
-const { EmbedBuilder, PermissionFlagsBits, WebhookClient } = require('discord.js');
+const Embed = require('../../structures/Embed');
+const { PermissionFlagsBits } = require('discord.js');
 
-module.exports = class Test extends Command {
+module.exports = class Webhook extends Command {
     constructor() {
         super({
             name: 'webhook',
-            description: 'Show the number of webhook or delete all the webhook | Afficher le nombre de webhook ou les supprimer',
-            usage: 'webhook < size / delete >',
+            description: 'Gérer les webhooks du serveur',
+            usage: 'webhook <size / delete>',
             category: 'moderation',
             aliases: ['wb'],
             clientPermissions: [PermissionFlagsBits.ManageWebhooks],
@@ -17,38 +18,31 @@ module.exports = class Test extends Command {
     }
 
     async run(client, message, args) {
-
         const guildData = client.getGuildData(message.guild.id);
-        const lang = client.lang(guildData.lang)
-        const color = guildData.color
-        const del = args[0] === 'delete';
+        const lang = client.lang(guildData.lang);
+
         if (!args[0]) {
-            const embed = new EmbedBuilder()
-                .setAuthor({ name: `Informations Invitations`, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-                .setColor(`${color}`)
-                .setTimestamp()
-                .setThumbnail(`https://images-ext-1.discordapp.net/external/io8pRqFGLz1MelORzIv2tAiPB3uulaHCX_QH7XEK0y4/%3Fwidth%3D588%26height%3D588/https/media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg`)
-                .setFooter({ text: "Massrole", iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-                .addFields({ name: '👥 MassRole:', value: `[\`massrole add\`](https://discord.gg/h69YZHB7Nh) ・ Setup du système d'invitations\n[\`massrole remove\`](https://discord.gg/h69YZHB7Nh) ・ Suppression de rôle en masse` })
-            message.channel.send({ embeds: [embed] })
-        }
-        const size = args[0] === "size";
-        if (size) {
-            message.guild.fetchWebhooks().then((webhooks) => {
-                message.channel.send(lang.webhook.replyMsg(message.guild, webhooks))
-            })
-        } else if (del) {
-            message.channel.send(lang.webhook.replyMsgDelete)
-            message.guild.fetchWebhooks().then((webhooks) => {
-                webhooks.forEach((webhook) => {
-                    let strURL = `https://discordapp.com/api/v8/webhooks/${webhook.id}/${webhook.token}`
-                    for (let index = 0; index < 5; index++) {
-                        fetch(strURL, { method: 'DELETE' }).catch(() => {});
-                    }
-                })
-            })
+            const embed = new Embed(client, guildData)
+                .setAuthor({ name: 'Webhooks', iconURL: client.user.displayAvatarURL() })
+                .setDescription(
+                    `\`webhook size\` — Nombre de webhooks\n` +
+                    `\`webhook delete\` — Supprimer tous les webhooks`
+                );
+            return message.reply({ embeds: [embed] });
         }
 
+        if (args[0] === 'size') {
+            message.guild.fetchWebhooks().then(webhooks => {
+                message.reply(lang.webhook.replyMsg(message.guild, webhooks));
+            });
+        } else if (args[0] === 'delete') {
+            message.reply(lang.webhook.replyMsgDelete);
+            message.guild.fetchWebhooks().then(webhooks => {
+                webhooks.forEach(webhook => {
+                    let strURL = `https://discordapp.com/api/v8/webhooks/${webhook.id}/${webhook.token}`;
+                    for (let i = 0; i < 5; i++) fetch(strURL, { method: 'DELETE' }).catch(() => {});
+                });
+            });
+        }
     }
-
-}
+};

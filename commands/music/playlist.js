@@ -33,7 +33,7 @@ module.exports = class Playlist extends Command {
         const type = args[0];
         const playlistName = args.slice(1).join(' ');
 
-        if (!playlistName) return message.channel.send(lang.music.playlist.noPlaylistName);
+        if (!playlistName) return message.reply(lang.music.playlist.noPlaylistName);
 
         const filter = response => response.author.id === message.author.id;
 
@@ -80,23 +80,23 @@ module.exports = class Playlist extends Command {
         if (usersPlaylist.has(message.author.id)) {
             const authorPlaylist = usersPlaylist.get(message.author.id);
             if (authorPlaylist.length >= 10) {
-                return message.channel.send(lang.music.playlist.toManyPlaylist);
+                return message.reply(lang.music.playlist.toManyPlaylist);
             }
             if (authorPlaylist.find(pl => pl.name === playlistName)) {
-                return message.channel.send(lang.music.playlist.alreadyName);
+                return message.reply(lang.music.playlist.alreadyName);
             }
         }
 
-        const mp = await message.channel.send(lang.music.playlist.createQ);
+        const mp = await message.reply(lang.music.playlist.createQ);
         try {
             const collected = await mp.channel.awaitMessages({ filter, max: 1, time: 30000 });
             const msg = collected.first();
             if (!msg) return;
 
             const url = msg.content;
-            if (!url) return message.channel.send(lang.music.playlist.provideOnlyValidUrl);
+            if (!url) return message.reply(lang.music.playlist.provideOnlyValidUrl);
 
-            const awaiting = await message.channel.send(lang.loading);
+            const awaiting = await message.reply(lang.loading);
             const trackInfo = await this.searchTrack(client, url, message.author);
             if (!trackInfo) {
                 return awaiting.edit(lang.music.playlist.provideOnlyValidUrl);
@@ -137,22 +137,22 @@ module.exports = class Playlist extends Command {
      * ADD - add a song to an existing playlist
      */
     async handleAdd(client, message, playlistName, filter, lang, color) {
-        if (!usersPlaylist.has(message.author.id)) return message.channel.send(lang.music.playlist.noPlaylist);
+        if (!usersPlaylist.has(message.author.id)) return message.reply(lang.music.playlist.noPlaylist);
 
         const authorPlaylist = usersPlaylist.get(message.author.id);
         const playlistToEdit = authorPlaylist.find(pl => pl.name === playlistName);
-        if (!playlistToEdit) return message.channel.send(lang.music.playlist.notFound);
+        if (!playlistToEdit) return message.reply(lang.music.playlist.notFound);
 
-        const mp = await message.channel.send(lang.music.playlist.urlQ(playlistName));
+        const mp = await message.reply(lang.music.playlist.urlQ(playlistName));
         try {
             const collected = await mp.channel.awaitMessages({ filter, max: 1, time: 30000 });
             const msg = collected.first();
             if (!msg) return;
 
             const url = msg.content;
-            if (!url) return message.channel.send(lang.music.playlist.provideOnlyValidUrl);
+            if (!url) return message.reply(lang.music.playlist.provideOnlyValidUrl);
 
-            const awaiting = await message.channel.send(lang.loading);
+            const awaiting = await message.reply(lang.loading);
             const trackInfo = await this.searchTrack(client, url, message.author);
             if (!trackInfo) {
                 return awaiting.edit(lang.music.playlist.provideOnlyValidUrl);
@@ -184,20 +184,20 @@ module.exports = class Playlist extends Command {
      * REMOVE - remove a song from a playlist by URL
      */
     async handleRemove(client, message, playlistName, filter, lang) {
-        if (!usersPlaylist.has(message.author.id)) return message.channel.send(lang.music.playlist.noPlaylist);
+        if (!usersPlaylist.has(message.author.id)) return message.reply(lang.music.playlist.noPlaylist);
 
         const authorPlaylist = usersPlaylist.get(message.author.id);
         const playlistToEdit = authorPlaylist.find(pl => pl.name === playlistName);
-        if (!playlistToEdit) return message.channel.send(lang.music.playlist.notFound);
+        if (!playlistToEdit) return message.reply(lang.music.playlist.notFound);
 
-        const mp = await message.channel.send(lang.music.playlist.removeQ);
+        const mp = await message.reply(lang.music.playlist.removeQ);
         try {
             const collected = await mp.channel.awaitMessages({ filter, max: 1, time: 30000 });
             const msg = collected.first();
             if (!msg) return;
 
             if (msg.content.toLowerCase() === 'cancel') {
-                return message.channel.send(lang.cancel).then(m => {
+                return message.reply(lang.cancel).then(m => {
                     setTimeout(() => {
                         m.delete().catch(() => {});
                         mp.delete().catch(() => {});
@@ -210,7 +210,7 @@ module.exports = class Playlist extends Command {
             const songs = playlistToEdit.song;
 
             if (!songs.find(s => s.url === url)) {
-                return message.channel.send(lang.music.playlist.songNotFound);
+                return message.reply(lang.music.playlist.songNotFound);
             }
 
             playlistToEdit.song = songs.filter(s => s.url !== url);
@@ -223,7 +223,7 @@ module.exports = class Playlist extends Command {
             );
             StateManager.emit('playlist', message.author.id, authorPlaylist);
 
-            message.channel.send(lang.music.playlist.successRemove(playlistName)).then(m => {
+            message.reply(lang.music.playlist.successRemove(playlistName)).then(m => {
                 setTimeout(() => {
                     m.delete().catch(() => {});
                     mp.delete().catch(() => {});
@@ -238,11 +238,11 @@ module.exports = class Playlist extends Command {
      * DELETE - delete an entire playlist
      */
     async handleDelete(client, message, playlistName, lang) {
-        if (!usersPlaylist.has(message.author.id)) return message.channel.send(lang.music.playlist.noPlaylist);
+        if (!usersPlaylist.has(message.author.id)) return message.reply(lang.music.playlist.noPlaylist);
 
         const authorPlaylist = usersPlaylist.get(message.author.id);
         const playlistToEdit = authorPlaylist.find(pl => pl.name === playlistName);
-        if (!playlistToEdit) return message.channel.send(lang.music.playlist.notFound);
+        if (!playlistToEdit) return message.reply(lang.music.playlist.notFound);
 
         const newAuthorPlaylist = authorPlaylist.filter(pl => pl.name !== playlistName);
 
@@ -257,7 +257,7 @@ module.exports = class Playlist extends Command {
             StateManager.emit('playlist', message.author.id, newAuthorPlaylist);
         }
 
-        message.channel.send(lang.music.playlist.successDelete(playlistName)).then(m => {
+        message.reply(lang.music.playlist.successDelete(playlistName)).then(m => {
             setTimeout(() => {
                 m.delete().catch(() => {});
             }, 5000);
@@ -271,23 +271,23 @@ module.exports = class Playlist extends Command {
         if (usersPlaylist.has(message.author.id)) {
             const authorPlaylist = usersPlaylist.get(message.author.id);
             if (authorPlaylist.length >= 10) {
-                return message.channel.send(lang.music.playlist.toManyPlaylist);
+                return message.reply(lang.music.playlist.toManyPlaylist);
             }
             if (authorPlaylist.find(pl => pl.name === playlistName)) {
-                return message.channel.send(lang.music.playlist.alreadyName);
+                return message.reply(lang.music.playlist.alreadyName);
             }
         }
 
-        const mp = await message.channel.send(lang.music.playlist.urlPlaylistQ);
+        const mp = await message.reply(lang.music.playlist.urlPlaylistQ);
         try {
             const collected = await mp.channel.awaitMessages({ filter, max: 1, time: 30000 });
             const msg = collected.first();
             if (!msg) return;
 
             const url = msg.content;
-            if (!url) return message.channel.send(lang.music.playlist.provideOnlyValidUrl);
+            if (!url) return message.reply(lang.music.playlist.provideOnlyValidUrl);
 
-            const awaiting = await message.channel.send(lang.loading);
+            const awaiting = await message.reply(lang.loading);
 
             // Use discord-player v7 search with YOUTUBE_PLAYLIST type
             const result = await client.music.search(url, {

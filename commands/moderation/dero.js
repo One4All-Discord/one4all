@@ -37,7 +37,7 @@ module.exports = class Test extends Command {
                 })
 
             })
-            success = await message.channel.send(lang.dero.success);
+            success = await message.reply(lang.dero.success);
             setTimeout(() => {
                 success.delete();
             }, 5000)
@@ -52,7 +52,7 @@ module.exports = class Test extends Command {
                 })
 
             })
-            success = await message.channel.send(lang.dero.success);
+            success = await message.reply(lang.dero.success);
             setTimeout(() => {
                 success.delete();
             }, 5000)

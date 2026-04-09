@@ -22,12 +22,12 @@ module.exports = class Test extends Command{
 
     const color = guildData.color
     let isSetup = message.guild.setup;
-    if (!isSetup) return message.channel.send(lang.error.noSetup);
+    if (!isSetup) return message.reply(lang.error.noSetup);
     const member = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
-    if (!member) return message.channel.send(lang.mute.errorNoMember)
+    if (!member) return message.reply(lang.mute.errorNoMember)
     const muteRole = message.guild.roles.cache.get(guildData.config.muteRoleId);
-    if (!muteRole) return message.channel.send(lang.mute.errorCantFindRole);
-    if (member.roles.cache.has(muteRole.id)) return message.channel.send(lang.mute.errorAlreadyMute(member));
+    if (!muteRole) return message.reply(lang.mute.errorCantFindRole);
+    if (member.roles.cache.has(muteRole.id)) return message.reply(lang.mute.errorAlreadyMute(member));
     member.roles.add(muteRole).then(() => {
         const { logs } = lang
         const { modLog } = guildData.logs;
@@ -35,7 +35,7 @@ module.exports = class Test extends Command{
         if(channel && !channel.deleted){
             channel.send(logs.mute(message.member, member.user, 'lifetime', color, "mute"))
         }
-        message.channel.send(lang.mute.success(member));
+        message.reply(lang.mute.success(member));
         guildData.updateMute(member.id, true)
     })
 }}

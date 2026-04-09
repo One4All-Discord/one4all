@@ -21,16 +21,16 @@ module.exports = class Previous extends Command {
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours de lecture.');
         }
 
         try {
             await queue.history.previous();
             const embed = new Embed(client, guildData)
                 .setDescription('Retour à la musique précédente.');
-            message.channel.send({ embeds: [embed] });
+            message.reply({ embeds: [embed] });
         } catch (e) {
-            message.channel.send('Aucune musique précédente disponible.');
+            message.reply('Aucune musique précédente disponible.');
         }
     }
 };

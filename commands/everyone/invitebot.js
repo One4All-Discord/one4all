@@ -1,7 +1,8 @@
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { PermissionFlagsBits } = require('discord.js');
+const Embed = require('../../structures/Embed');
 const Command = require('../../structures/Handler/Command');
 
-module.exports = class Test extends Command {
+module.exports = class InviteBot extends Command {
     constructor() {
         super({
             name: 'invitebot',
@@ -10,23 +11,20 @@ module.exports = class Test extends Command {
             aliases: ['addbot'],
             usage: 'invitebot',
             cooldown: 5
-
         });
     }
 
     async run(client, message, args) {
         const guildData = client.getGuildData(message.guild.id);
-        const lang = client.lang(guildData.lang)
-        const color = guildData.color
-        const embed = new EmbedBuilder()
-            .setAuthor({ name: lang.inviteBot.invite, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-            .setColor(`${color}`)
-            .setTimestamp()
-            //   .setThumbnail(`https://images-ext-1.discordapp.net/external/io8pRqFGLz1MelORzIv2tAiPB3uulaHCX_QH7XEK0y4/%3Fwidth%3D588%26height%3D588/https/media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg`)
-            .setFooter({ text: lang.inviteBot.invite, iconURL: `https://media.discordapp.net/attachments/780528735345836112/780725370584432690/c1258e849d166242fdf634d67cf45755cc5af310r1-1200-1200v2_uhq.jpg?width=588&height=588` })
-            .setDescription(`[\`${lang.clic}\`](https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=8)`)
-        message.channel.send({ embeds: [embed] });
+
+        const embed = new Embed(client, guildData)
+            .setAuthor({ name: 'Inviter le bot', iconURL: client.user.displayAvatarURL() })
+            .setThumbnail(client.user.displayAvatarURL({ size: 256 }))
+            .setDescription(
+                `Ajoute **${client.user.username}** sur ton serveur !\n\u200b\n` +
+                `**[Ajouter à mon serveur](https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=8)**\n` +
+                `**[Serveur support](https://discord.gg/TfwGcCjyfp)**`
+            );
+        message.reply({ embeds: [embed] });
     }
 };
-
-

@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const userCoins = new Map();
 const Command = require('../../structures/Handler/Command');
@@ -21,12 +22,11 @@ module.exports = class Test extends Command {
         const lang = client.lang(guildData.lang)
         const lb = await guildData.getLeaderBoard()
         const color = guildData.color;
-        const embed = new EmbedBuilder()
+        const embed = new Embed(client, guildData)
             .setTitle(lang.lb.title)
             .setDescription(lb.map((user, i) => `${i + 1} . <@${user[1].userId}> : ${user[1].coins} coins`))
             .setFooter({ text: `OneForAll coins` })
-            .setColor(color)
-        message.channel.send({ embeds: [embed] })
+        message.reply({ embeds: [embed] })
 
 
     }

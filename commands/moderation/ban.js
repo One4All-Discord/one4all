@@ -23,10 +23,10 @@ module.exports = class Test extends Command {
         const color = guildData.color
 
         const user = message.mentions.users.first() || await client.users.fetch(args[0]).catch(async err => {
-            return await message.channel.send(lang.ban.noBan).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+            return await message.reply(lang.ban.noBan).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
         })
         if (user.id === message.author.id) {
-            return await message.channel.send(lang.ban.errorBanSelf).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+            return await message.reply(lang.ban.errorBanSelf).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
         }
 
         let reason = args.slice(1).join(" ");
@@ -40,10 +40,10 @@ module.exports = class Test extends Command {
             const memberPosition = member.roles.highest.position;
             const moderationPosition = message.member.roles.highest.position;
             if (message.guild.ownerId !== message.author.id && !(moderationPosition > memberPosition) && !client.isOwner(message.author.id)) {
-                return message.channel.send(lang.ban.errorRl(user)).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+                return message.reply(lang.ban.errorRl(user)).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
             }
             if (!member.bannable) {
-                return message.channel.send(lang.ban.errorRl(user)).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+                return message.reply(lang.ban.errorRl(user)).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
             }
         }
 
@@ -120,14 +120,14 @@ module.exports = class Test extends Command {
 
                     }
                 }
-                message.channel.send(lang.ban.success(user));
+                message.reply(lang.ban.success(user));
             }
         })
 
             .catch((err) => {
                 console.log('err', err)
-                if (err.toString().includes('Missing Permission')) return message.channel.send(lang.error.MissingPermission)
-                message.channel.send(lang.ban.error(user))
+                if (err.toString().includes('Missing Permission')) return message.reply(lang.error.MissingPermission)
+                message.reply(lang.ban.error(user))
             })
     }
 };

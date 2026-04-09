@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 
 const Command = require('../../structures/Handler/Command');
@@ -22,17 +23,16 @@ module.exports = class Test extends Command {
         const color = guildData.color
         const lang = client.lang(guildData.lang)
 
-        if (!args[0]) return message.channel.send(lang.ball.noQuestion)
+        if (!args[0]) return message.reply(lang.ball.noQuestion)
         let replies = lang.ball.reponseQuestion
         let result = Math.floor((Math.random() * 8));
         let question = args.slice().join(" ");
-        let ballembed = new EmbedBuilder()
+        let ballembed = new Embed(client, guildData)
             .setAuthor({ name: `🎱 ${message.author.username}` })
-            .setColor(`${color}`)
             .addFields({ name: "Question", value: question })
             .addFields({ name: lang.ball.reponse, value: replies[result] })
 
-        message.channel.send({ embeds: [ballembed] })
+        message.reply({ embeds: [ballembed] })
 
     }
 };

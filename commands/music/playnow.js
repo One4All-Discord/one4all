@@ -21,10 +21,10 @@ module.exports = class PlayNow extends Command {
         const query = args.join(' ');
 
         if (!message.member.voice.channel) {
-            return message.channel.send('Vous devez être dans un salon vocal pour jouer de la musique.');
+            return message.reply('Vous devez être dans un salon vocal pour jouer de la musique.');
         }
         if (!query) {
-            return message.channel.send('Veuillez spécifier une musique à jouer.');
+            return message.reply('Veuillez spécifier une musique à jouer.');
         }
 
         try {
@@ -52,10 +52,10 @@ module.exports = class PlayNow extends Command {
                 .setThumbnail(track.thumbnail)
                 .setRequestedBy(message.author);
 
-            message.channel.send({ embeds: [embed] });
+            message.reply({ embeds: [embed] });
         } catch (e) {
             console.error(e);
-            message.channel.send('Une erreur est survenue lors de la lecture.');
+            message.reply('Une erreur est survenue lors de la lecture.');
         }
     }
 };

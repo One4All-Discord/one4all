@@ -21,13 +21,13 @@ module.exports = class Search extends Command {
         const query = args.join(' ');
 
         if (!query) {
-            return message.channel.send('Veuillez spécifier une recherche.');
+            return message.reply('Veuillez spécifier une recherche.');
         }
         if (!message.member.voice.channel) {
-            return message.channel.send('Vous devez être dans un salon vocal.');
+            return message.reply('Vous devez être dans un salon vocal.');
         }
 
-        const msg = await message.channel.send('Recherche en cours...');
+        const msg = await message.reply('Recherche en cours...');
 
         try {
             const result = await client.music.search(query, {
@@ -76,16 +76,16 @@ module.exports = class Search extends Command {
 
                     const playEmbed = new Embed(client, guildData)
                         .setDescription(`[**${chosen.title}**](${chosen.url}) ajoutée à la file d'attente.`);
-                    message.channel.send({ embeds: [playEmbed] });
+                    message.reply({ embeds: [playEmbed] });
                 } catch (e) {
                     console.error(e);
-                    message.channel.send('Erreur lors de la lecture.');
+                    message.reply('Erreur lors de la lecture.');
                 }
             });
 
             collector.on('end', (collected) => {
                 if (collected.size === 0) {
-                    message.channel.send('Recherche expirée.');
+                    message.reply('Recherche expirée.');
                 }
                 msg.reactions.removeAll().catch(() => {});
             });

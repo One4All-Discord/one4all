@@ -22,7 +22,7 @@ module.exports = class Lyrics extends Command {
         const queue = useQueue(message.guildId);
 
         if (!queue || !queue.currentTrack) {
-            return message.channel.send('Aucune musique en cours de lecture.');
+            return message.reply('Aucune musique en cours de lecture.');
         }
 
         const track = queue.currentTrack;
@@ -40,6 +40,6 @@ module.exports = class Lyrics extends Command {
             .setAuthor({ name: `Paroles - ${track.title}` })
             .setDescription(lyrics.length > 2048 ? lyrics.substring(0, 2045) + '...' : lyrics);
 
-        message.channel.send({ embeds: [embed] });
+        message.reply({ embeds: [embed] });
     }
 };

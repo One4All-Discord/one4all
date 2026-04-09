@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder } = require('discord.js');
 const StateManager = require('../../utils/StateManager');
 const prettyMilliseconds = require('pretty-ms');
@@ -29,12 +30,12 @@ module.exports = class UserStat extends Command {
         } else {
             member = message.member;
         }
-        if (member === undefined) return message.channel.send(lang.stats.memberNotFound).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+        if (member === undefined) return message.reply(lang.stats.memberNotFound).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
         let totalDuration = 0;
         let mostActiveChannel;
         let mostActiveChannelDuration = 0;
         await this.connection.query(`SELECT * FROM statsVoc WHERE userId = '${member.user.id}' AND guildId = '${message.guild.id}'`).then(async (res) => {
-            if (res[0].length === 0) return message.channel.send(lang.stats.noStatsFound).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+            if (res[0].length === 0) return message.reply(lang.stats.noStatsFound).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
             const voiceStats = res[0];
             voiceStats.forEach(async stats => {
                 totalDuration += stats.duration;
@@ -50,13 +51,12 @@ module.exports = class UserStat extends Command {
             }
         });
         if (totalDuration !== 0) {
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setDescription(lang.stats.desc(member))
                 .addFields({ name: lang.stats.totalVoiceChat, value: prettyMilliseconds(totalDuration), inline: true })
                 .addFields({ name: lang.stats.voiceMostActive, value: mostActiveChannel === undefined ? lang.stats.noVoiceChannel : `**${mostActiveChannel.name}**  __${prettyMilliseconds(mostActiveChannelDuration)}__`, inline: true })
-                .setColor(`${color}`)
                 .setFooter({ text: client.user.username, iconURL: member.user.displayAvatarURL() });
-            message.channel.send({ embeds: [embed] });
+            message.reply({ embeds: [embed] });
         }
     }
 };

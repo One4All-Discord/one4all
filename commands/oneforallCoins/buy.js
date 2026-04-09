@@ -1,3 +1,4 @@
+const Embed = require('../../structures/Embed');
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const userCoins = new Map();
 const coinSettings = new Map();
@@ -26,33 +27,33 @@ module.exports = class Test extends Command {
         const lang = client.lang(guildData.lang)
 
         const idToBuy = args[0];
-        if (!guildData.config.coinsOn) return message.channel.send(lang.buy.shoDisable).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
-        if (!idToBuy) return message.channel.send(lang.buy.syntaxError).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+        if (!guildData.config.coinsOn) return message.reply(lang.buy.shoDisable).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+        if (!idToBuy) return message.reply(lang.buy.syntaxError).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
         const shop = guildData.shop;
         let coins = client.getMemberData(message.guild.id, message.member.user?.id || message.member.id).coins
-        if (!coins) return message.channel.send(lang.buy.noCoins).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
-        if (coins < 1 || !coins) return message.channel.send(lang.buy.noCoins).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
-        if (shop.find(shop => shop.id === 0)) return message.channel.send(lang.buy.nothingInShop).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
-        if (shop.length < parseInt(idToBuy) || parseInt(idToBuy) < 1) return message.channel.send(lang.buy.itemNotInShop).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+        if (!coins) return message.reply(lang.buy.noCoins).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+        if (coins < 1 || !coins) return message.reply(lang.buy.noCoins).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+        if (shop.find(shop => shop.id === 0)) return message.reply(lang.buy.nothingInShop).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+        if (shop.length < parseInt(idToBuy) || parseInt(idToBuy) < 1) return message.reply(lang.buy.itemNotInShop).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
 
         const {price, role, item} = shop.filter(shop => shop.id === parseInt(idToBuy))[0]
-        if (price > coins) return message.channel.send(lang.buy.notEnoughCoins).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
+        if (price > coins) return message.reply(lang.buy.notEnoughCoins).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000));
         let roleCol;
         coins -= price
 
         if (role) {
             roleCol = message.guild.roles.cache.get(item.replace('<@&', '').replace('>', ''));
 
-            if (message.member.roles.cache.has(roleCol.id)) return message.channel.send(lang.buy.alreadyRole).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
+            if (message.member.roles.cache.has(roleCol.id)) return message.reply(lang.buy.alreadyRole).then(mp => setTimeout(() => mp.delete().catch(() => {}), 4000))
 
 
-            message.channel.send(lang.buy.success(`**${roleCol.name}**`, price)).then((mp) => {
+            message.reply(lang.buy.success(`**${roleCol.name}**`, price)).then((mp) => {
                 setTimeout(() => mp.delete().catch(() => {}), 4000)
                 message.member.roles.add(roleCol.id, `Coins shop`)
             })
         } else {
 
-            message.channel.send(lang.buy.success(item, price)).then(() => {
+            message.reply(lang.buy.success(item, price)).then(() => {
                 let memberInvetory = client.getMemberData(message.guild.id, message.member.user?.id || message.member.id).inventory
                 const itemBuyed = shop.filter(shop => shop.id === parseInt(idToBuy))[0]
 
@@ -87,10 +88,8 @@ module.exports = class Test extends Command {
 
         const logsChannel = message.guild.channels.cache.get(guildData.config.coinsLogs);
         if (logsChannel && logsChannel.manageable && !logsChannel.deleted) {
-            const embed = new EmbedBuilder()
+            const embed = new Embed(client, guildData)
                 .setDescription(lang.buy.buyLog(message.member, !roleCol ? item : roleCol.name, price))
-                .setTimestamp()
-                .setColor(`${color}`)
             logsChannel.send({ embeds: [embed] })
         }
 
