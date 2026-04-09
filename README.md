@@ -10,7 +10,7 @@
 
 <br>
 
-[Invite le bot](https://discord.gg/h69YZHB7Nh) | [Support](https://discord.gg/h69YZHB7Nh) | [Documentation](#installation)
+[Invite le bot]([https://discord.gg/h69YZHB7Nh](https://discord.com/oauth2/authorize?client_id=1491570460092006672&permissions=8&integration_type=0&scope=bot)) | [Support](https://discord.gg/TfwGcCjyfp) | [Documentation](#installation)
 
 </div>
 
