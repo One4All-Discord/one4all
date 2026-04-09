@@ -60,14 +60,13 @@ module.exports = class Test extends Command {
 
                 let embed = new Embed(client, guildData)
 
-                embed.setTitle(`▫️ Liste des membres whitelist`)
+                embed.setAuthor({ name: `▫️ Liste des membres whitelist`, iconURL: client.user.displayAvatarURL() })
                     .setDescription(whitelisted
                         .filter(x => message.guild.members.cache.get(x))
                         .map(r => r)
                         .map((user, i) => `${i + 1} ・ **<@${message.guild.members.cache.get(user).user.id}>**`)
                         .slice(0, 10)
                         .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(whitelisted.length / 10)}**`)
-                    .setFooter({ text: `${client.user.username}` });
 
                 let reac1
                 let reac2
@@ -149,9 +148,8 @@ module.exports = class Test extends Command {
             }
         } else if (clear) {
             const embed = new Embed(client, guildData)
-                .setTitle(`Confirmation`)
+                .setAuthor({ name: `Confirmation`, iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.whitelisted.clearWl)
-                .setFooter({ text: client.user.username })
             const msg = await message.reply({ embeds: [embed] })
             await msg.react('✅')
             await msg.react('❌')

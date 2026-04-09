@@ -54,9 +54,8 @@ module.exports = class Test extends Command {
             let ignoreEmo = false;
             let ignoreBans = false;
             configEmbed = new Embed(client, guildData)
-                .setTitle(lang.backup.configEmbedT)
+                .setAuthor({ name: lang.backup.configEmbedT, iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.backup.configEmbedDesc(ignoreCh, ignoreRl, ignoreEmo, ignoreBans))
-                .setFooter({ text: client.user.username });
 
             msg.edit({ content: '\u200b', embeds: [configEmbed] }).then(async m => {
                 const collector = m.createReactionCollector({ filter: filter, time: 900000});
@@ -184,10 +183,9 @@ module.exports = class Test extends Command {
                 }
                 if (backupsName.length === 0 && backupsId.length === 0) return message.reply(`▫️ \`ERREUR\` **${message.author.username }**, vous ne posséder pas de backup`)
                 const embed = new Embed(client, guildData)
-                    .setTitle(`Liste des backup de __${message.author.username}__:`)
+                    .setAuthor({ name: `Liste des backup de __${message.author.username}__:`, iconURL: client.user.displayAvatarURL() })
                     .addFields({ name: `📝 Serveur Name`, value: `${backupsName.join('\n')}`, inline: true })
                     .addFields({ name: `📋 Backup Id`, value: `${backupsId.join('\n')}`, inline: true })
-                    .setFooter({ text: client.user.username })
                 message.reply({ embeds: [embed] })
         }
         if (load) {
@@ -234,10 +232,9 @@ module.exports = class Test extends Command {
                 channelsSize.push(cat.children.length)
             }
             const embed = new Embed(client, guildData)
-            embed.setTitle(`Information sur la backup ${backupId}`)
+            embed.setAuthor({ name: `Information sur la backup ${backupId}`, iconURL: client.user.displayAvatarURL() })
             embed.setDescription(`🎨 Nombres de roles - **${rolesSize}**\n▫️ Nombres d'emojis - **${emojisSize}**\n📁 Nombres de catégories - **${categories.length}**\n💬 Nombres de channels - **${channelsSize.reduce((a, b) => a + b, 0)}**\n▫️ Nombres de bannis - **${bansSize}**\n🟡 Backup crée le - **${(() => { const d = new Date(guildData.createdTimestamp); return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; })()}**`)
             embed.setTimestamp()
-            embed.setFooter({ text: client.user.username })
             if (ico !== undefined) {
                 embed.setThumbnail(ico)
             }
@@ -325,10 +322,9 @@ module.exports = class Test extends Command {
 
         function updateEmbed(ignoreCh, ignoreRl, ignoreEmo, ignoreBans) {
             const dd = new Embed(client, guildData)
-            dd.setTitle(lang.backup.configEmbedT)
+            dd.setAuthor({ name: lang.backup.configEmbedT, iconURL: client.user.displayAvatarURL() })
             dd.setDescription(lang.backup.configEmbedDesc(ignoreCh, ignoreRl, ignoreEmo, ignoreBans))
             dd.setTimestamp()
-            dd.setFooter({ text: client.user.username });
             msg.edit({ embeds: [dd] })
         }
     }

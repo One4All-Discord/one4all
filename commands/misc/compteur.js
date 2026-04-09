@@ -49,9 +49,8 @@ module.exports = class Test extends Command {
                 return response.author.id === message.author.id
             };
         const embed = new Embed(client, guildData)
-            .setTitle(lang.counter.embedTitle)
+            .setAuthor({ name: lang.counter.embedTitle, iconURL: client.user.displayAvatarURL() })
             .setDescription(lang.counter.embedDescription(memberCount.get(message.guild.id).name, botCount.get(message.guild.id).name, voiceCount.get(message.guild.id).name, onlineCount.get(message.guild.id).name, offlineCount.get(message.guild.id).name, channelCount.get(message.guild.id).name, roleCount.get(message.guild.id).name, boosterCount.get(message.guild.id).name))
-            .setFooter({ text: client.user.username })
         msg.edit({ embeds: [embed] }).then(async m => {
             const collector = m.createReactionCollector({ filter: filter, time: 900000});
             collector.on('collect', async r => {

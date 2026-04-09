@@ -20,7 +20,7 @@ module.exports = class Test extends Command {
         if(!lb) return message.reply(`Can't find top 10 invites`)
         const color = guildData.color;
         const embed = new Embed(client, guildData)
-            .setTitle(`Top 10 invites ${message.guild.name}`)
+            .setAuthor({ name: `Top 10 invites ${message.guild.name}`, iconURL: client.user.displayAvatarURL() })
             .setDescription(lb.map((invite, i) => `${i+1} - <@${invite.userId}> : **${invite.count.join}** join,**${invite.count.leave}** leave, **${invite.count.fake}** fake, **${invite.count.bonus}** bonus\n`))
             .setFooter({ text: message.guild.name })
         await message.reply({ embeds: [embed] })

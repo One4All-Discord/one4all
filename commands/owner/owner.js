@@ -57,7 +57,7 @@ module.exports = class Test extends Command {
 
                 let embed = new Embed(client, guildData)
 
-                embed.setTitle(lang.owner.titleList)
+                embed.setAuthor({ name: lang.owner.titleList, iconURL: client.user.displayAvatarURL() })
                     .setDescription(owners
                         .filter(x => message.guild.members.cache.get(x))
                         .map(r => r)
@@ -149,9 +149,8 @@ module.exports = class Test extends Command {
 
 
             const embed = new Embed(client, guildData)
-                .setTitle(`Confirmation`)
+                .setAuthor({ name: `Confirmation`, iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.owner.clearOwner)
-                .setFooter({ text: client.user.username })
             const msg = await message.reply({ embeds: [embed] })
             await msg.react('✅')
             await msg.react('❌')

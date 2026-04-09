@@ -40,9 +40,8 @@ module.exports = class Test extends Command {
         await msg.react('❌')
         await msg.react('✅')
         let embed = new Embed(client, guildData)
-            .setTitle(lang.reactionRole.embedTitle)
+            .setAuthor({ name: lang.reactionRole.embedTitle, iconURL: client.user.displayAvatarURL() })
             .setDescription(lang.reactionRole.embedDescription(chs.get(message.guild.id), msgId.get(message.guild.id), ['Non définie']))
-            .setFooter({ text: client.user.username })
             .setTimestamp()
 
         const filter = (reaction, user) => ['📖', '🆔', '💠', '🚫', '📛', '❌', '✅'].includes(reaction.emoji.name) && user.id === message.author.id,

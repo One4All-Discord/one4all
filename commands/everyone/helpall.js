@@ -30,7 +30,7 @@ module.exports = class HelpAll extends Command {
 
         const pages = categories.map(cat => {
             return new Embed(client, guildData)
-                .setTitle(`${cat.emoji}  ${cat.name}`)
+                .setAuthor({ name: `${cat.emoji}  ${cat.name}`, iconURL: client.user.displayAvatarURL() })
                 .setDescription(cat.cmds.map(c => `▸ \`${prefix}${c}\``).join('\n'));
         });
 

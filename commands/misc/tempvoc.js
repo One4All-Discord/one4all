@@ -35,9 +35,8 @@ module.exports = class Test extends Command {
 
 
         const embed = new Embed(client, guildData)
-            .setTitle(lang.tempvoc.embedTitle)
+            .setAuthor({ name: lang.tempvoc.embedTitle, iconURL: client.user.displayAvatarURL() })
             .setDescription(lang.tempvoc.embedDescription(categoryNameMapping.get(message.guild.id).chName, enable.get(message.guild.id)))
-            .setFooter({ text: client.user.username });
 
         const filter = (reaction, user) => emojis.includes(reaction.emoji.name) && user.id === message.author.id,
             dureefiltrer = response => {

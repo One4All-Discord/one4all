@@ -37,7 +37,7 @@ module.exports = class Test extends Command{
                 // console.log(tempName.map(r => r).map((user, i) => message.guild.members.cache.get(user).user.id, i))
 
                 let embed = new Embed(client, guildData)
-                embed.setTitle(`${lang.serverlist.title}`)
+                embed.setAuthor({ name: `${lang.serverlist.title}`, iconURL: client.user.displayAvatarURL() })
                     .setDescription(tempName
                         .slice(0, 10)
                         .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempName.length / 10)}**`)

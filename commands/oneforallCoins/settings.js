@@ -42,9 +42,8 @@ module.exports = class Test extends Command {
             logs: guildData.config.coinsLogs
         }
         const embed = new Embed(client, guildData)
-            .setTitle(lang.coinSettings.title)
+            .setAuthor({ name: lang.coinSettings.title, iconURL: client.user.displayAvatarURL() })
             .setDescription(lang.coinSettings.description(config.streamBoost, config.muteDiviseur, config.logs, config.enable === false ? 'Désactiver' : 'Activer'))
-            .setFooter({ text: client.user.username })
         principalMsg.edit({ embeds: [embed] }).then(async m => {
             const collector = m.createReactionCollector({ filter: filter, time: 900000});
             collector.on('collect', async r => {

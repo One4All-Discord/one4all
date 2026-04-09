@@ -27,9 +27,8 @@ module.exports = class Test extends Command {
         await msg.react("🇬🇧");
         await msg.react("❌");
         const embed = new Embed(client, guildData)
-            .setTitle(lang.setlang.title)
+            .setAuthor({ name: lang.setlang.title, iconURL: client.user.displayAvatarURL() })
             .setDescription(lang.setlang.description(guildData.lang))
-            .setFooter({ text: `${client.user.username}` });
         const filter = (reaction, user) => ['🇫🇷', '🇬🇧', '❌'].includes(reaction.emoji.name) && user.id === message.author.id,
             dureefiltrer = response => {
                 return response.author.id === message.author.id

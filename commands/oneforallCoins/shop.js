@@ -149,7 +149,7 @@ module.exports = class Test extends Command {
                     return response.author.id === message.author.id
                 };
             const embed = new Embed(client, guildData)
-                .setTitle(itemToEdit[0].item)
+                .setAuthor({ name: itemToEdit[0].item, iconURL: client.user.displayAvatarURL() })
                 .setDescription(`
             ${lang.addShop.editCondition}
 

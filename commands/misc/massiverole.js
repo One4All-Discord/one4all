@@ -51,9 +51,8 @@ module.exports = class Test extends Command{
             if (member.get(message.guild.id).size === 0) return message.reply(lang.massrole.errorRlAlready(role))
             let timeLeft = ms(`${member.get(message.guild.id).size}s`)
             const embed = new Embed(client, guildData)
-                .setTitle(lang.massrole.title(role, member.get(message.guild.id).size))
+                .setAuthor({ name: lang.massrole.title(role, member.get(message.guild.id).size), iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.massrole.descriptionTimeLeft(timeLeft))
-                .setFooter({ text: client.user.username })
                 .setTimestamp();
             const msg = await message.reply({ embeds: [embed] })
 
@@ -105,9 +104,8 @@ module.exports = class Test extends Command{
             if (member.get(message.guild.id).size === 0) return message.reply(lang.massrole.errorRlNot(role))
             let timeLeft = ms(`${member.get(message.guild.id).size}s`)
             const embed = new Embed(client, guildData)
-                .setTitle(lang.massrole.titleRm(role, member.get(message.guild.id).size))
+                .setAuthor({ name: lang.massrole.titleRm(role, member.get(message.guild.id).size), iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.massrole.descriptionTimeLeft(timeLeft))
-                .setFooter({ text: client.user.username })
                 .setTimestamp();
             const msg = await message.reply({ embeds: [embed] })
 
@@ -158,9 +156,8 @@ module.exports = class Test extends Command{
             if(!done.has(message.guild.id) || !member.has(message.guild.id)) return message.reply(lang.nickall.noMassrole)
             let timeLeft = ms(`${member.get(message.guild.id).size - done.get(message.guild.id)}s`)
             const status = new Embed(client, guildData)
-                .setTitle('Status')
+                .setAuthor({ name: 'Status', iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.descriptionTimeLeft(timeLeft))
-                .setFooter({ text: client.user.username })
             message.reply({ embeds: [status] })
         }
 

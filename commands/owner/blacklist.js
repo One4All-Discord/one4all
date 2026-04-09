@@ -243,12 +243,11 @@ module.exports = class Test extends Command {
 
                 }
                 let embed = new Embed(client, guildData)
-                embed.setTitle(lang.blacklist.titleList)
+                embed.setAuthor({ name: lang.blacklist.titleList, iconURL: client.user.displayAvatarURL() })
                 embed.setDescription(tempMember
                     .map((user, i) => `${i + 1} ・ **${user.username}** \`${user.id}\``)
                     .slice(0, 10)
                     .join('\n') + `\n\n▫️ Page **${page}** / **${Math.ceil(tempdata.length / 10)}**`)
-                    .setFooter({ text: `${client.user.username}` });
 
                 let reac1
                 let reac2
@@ -324,9 +323,8 @@ module.exports = class Test extends Command {
             }
         } else if (clear) {
             const embed = new Embed(client, guildData)
-                .setTitle(`Confirmation`)
+                .setAuthor({ name: `Confirmation`, iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.blacklist.clearBl)
-                .setFooter({ text: client.user.username })
             const msg = await message.reply({ embeds: [embed] })
             await msg.react('✅')
             await msg.react('❌')

@@ -28,7 +28,7 @@ module.exports = class Test extends Command{
 
     const embed = new Embed(client, guildData)
         .setImage(img)
-        .setTitle(lang.meme.reponse(random))
+        .setAuthor({ name: lang.meme.reponse(random), iconURL: client.user.displayAvatarURL() })
         .setURL(`https://reddit.com/r/${random}`)
 
     message.reply({ embeds: [embed] })

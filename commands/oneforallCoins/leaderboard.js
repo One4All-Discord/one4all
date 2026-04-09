@@ -23,7 +23,7 @@ module.exports = class Test extends Command {
         const lb = await guildData.getLeaderBoard()
         const color = guildData.color;
         const embed = new Embed(client, guildData)
-            .setTitle(lang.lb.title)
+            .setAuthor({ name: lang.lb.title, iconURL: client.user.displayAvatarURL() })
             .setDescription(lb.map((user, i) => `${i + 1} . <@${user[1].userId}> : ${user[1].coins} coins`))
             .setFooter({ text: `OneForAll coins` })
         message.reply({ embeds: [embed] })

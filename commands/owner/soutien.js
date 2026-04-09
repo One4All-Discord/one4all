@@ -55,9 +55,8 @@ module.exports = class Test extends Command {
             }
 
             const embed = new Embed(client, guildData)
-                .setTitle(lang.soutien.title)
+                .setAuthor({ name: lang.soutien.title, iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.soutien.description(soutienId, soutienMsg, isOnS, message.guild))
-                .setFooter({ text: client.user.username });
             msg.edit({ embeds: [embed] })
             const data_res = msg.createReactionCollector({ filter: (reaction, user) => user.id === message.author.id, time: 120000 });
             data_res.on("collect", async (reaction) => {
@@ -197,7 +196,7 @@ module.exports = class Test extends Command {
             const Role = message.guild.roles.cache.get(rlId);
             const count = Role.members.size;
             let Embed = new Embed(client, guildData)
-                .setTitle("🆘 __Soutient__")
+                .setAuthor({ name: "🆘 __Soutient__", iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.soutien.descriptionCount(count))
                 .setFooter({ text: `${client.user.username}`, iconURL: client.user.displayAvatarURL() })
             message.reply({ embeds: [Embed] })

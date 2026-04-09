@@ -42,9 +42,8 @@ module.exports = class Test extends Command {
             await setlogsMsg.react(reac)
         }
         const logsEmbed = new Embed(client, guildData)
-            .setTitle(lang.setlogs.embedTitle)
+            .setAuthor({ name: lang.setlogs.embedTitle, iconURL: client.user.displayAvatarURL() })
             .setDescription(lang.setlogs.embedDescription(raidLog.get(message.guild.id), modLog.get(message.guild.id), voiceLog.get(message.guild.id), msgLog.get(message.guild.id)))
-            .setFooter({ text: client.user.username })
         setlogsMsg.edit({ embeds: [logsEmbed] })
             .then(async m => {
                 const collector = m.createReactionCollector({ filter: filter, time: 900000});

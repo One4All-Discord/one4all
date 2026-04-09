@@ -25,7 +25,7 @@ module.exports = class Test extends Command{
 
     let rng = Math.floor(Math.random() * 100)
     const gaydetectorembed = new Embed(client, guildData)
-    .setTitle(lang.gaydetector.title)
+    .setAuthor({ name: lang.gaydetector.title, iconURL: client.user.displayAvatarURL() })
     .setDescription(`**${member.username}** est gay à ${rng}% 🏳️‍🌈`)
 
     message.reply({ embeds: [gaydetectorembed] })

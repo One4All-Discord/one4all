@@ -35,7 +35,6 @@ module.exports = class Test extends Command {
             }
             const embed = new Embed(client, guildData)
                 .setDescription(`${lang.invite.countDesc(message.author.username, count.join - count.leave > 0 ? count.join - count.leave : 0, inv)}\n (__${count.join}__ join, __${count.leave}__ leave, __${count.fake}__ fake, __${count.bonus}__ bonus)`)
-                .setFooter({ text: client.user.username })
             message.reply({ embeds: [embed] });
         } else if (message.mentions.members.first() || !isNaN(args[0])) {
             const member = await message.mentions.members.first() || await message.guild.members.fetch(args[0]).catch(async err => {
@@ -47,7 +46,6 @@ module.exports = class Test extends Command {
             }
             const embed = new Embed(client, guildData)
                 .setDescription(`${lang.invite.countDesc(member.user.username, count.join - count.leave > 0 ? count.join - count.leave : 0, inv)}\n (__${count.join}__ join, __${count.leave}__ leave, __${count.fake}__ fake, __${count.bonus}__ bonus)`)
-                .setFooter({ text: client.user.username })
             message.reply({ embeds: [embed] });
         }
 
@@ -75,9 +73,8 @@ module.exports = class Test extends Command {
 
 
             const embed = new Embed(client, guildData)
-                .setTitle(lang.invite.titleConfig)
+                .setAuthor({ name: lang.invite.titleConfig, iconURL: client.user.displayAvatarURL() })
                 .setDescription(lang.invite.descConfig(inviteChannel, message.guild, isOnS, inviteMsg))
-                .setFooter({ text: client.user.username });
             msg.edit({ embeds: [embed] })
             const data_res = msg.createReactionCollector({ filter: (reaction, user) => user.id === message.author.id, time: 120000 });
             data_res.on("collect", async (reaction) => {
@@ -140,9 +137,8 @@ module.exports = class Test extends Command {
                     const totalMemberHelp = "${memberTotal} ・ Sert à afficher le nombre total de membres sur le serveur"
                     const space = "${space} ・ Sert à faire un retour à la ligne"
                     const help = new Embed(client, guildData)
-                        .setTitle(`Help`)
+                        .setAuthor({ name: `Help`, iconURL: client.user.displayAvatarURL() })
                         .setDescription(lang.invite.helpDesc(invitedHelp, inviterHelp, invitedMention, inviterMention, accountCreate, countHelp, fakeHelp, leaveHelp, totalMemberHelp, space))
-                        .setFooter({ text: client.user.username });
                     message.reply({ embeds: [help] })
                 } else if (reaction.emoji.name === "4️⃣") {
                     let question = await message.reply(lang.invite.enableQ)
